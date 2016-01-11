@@ -1,0 +1,102 @@
+<html>
+<head>
+<title>My first chart using FusionCharts Suite XT</title>
+<script type="text/javascript" src="js/fusioncharts.js"></script>
+<script type="text/javascript" src="js/themes/fusioncharts.theme.fint.js"></script>
+
+
+<script type="text/javascript">
+  
+
+
+  FusionCharts.ready(function(){
+    var revenueChart = new FusionCharts({
+        "type": "line",
+        "renderAt": "chartContainer",
+        "width": "500",
+        "height": "300",
+        "dataFormat": "json",
+        "dataSource":  {
+          "chart": {
+            "caption": "Anneke Preusig's Salary History",
+            "subCaption": "Question 1",
+            "xAxisName": "Date",
+            "yAxisName": "Salary",
+            "theme": "fint"
+         },
+            "data": [
+                {
+                    "_tend": "1991-08-05",
+                    "label": "1990-08-05",
+                    "value": "40000"
+                },
+                {
+                    "_tend": "1992-08-04",
+                    "label": "1991-08-05",
+                    "value": "42085"
+                },
+                {
+                    "_tend": "1993-08-04",
+                    "label": "1992-08-04",
+                    "value": "42629"
+                },
+                {
+                    "_tend": "1994-08-04",
+                    "label": "1993-08-04",
+                    "value": "45844"
+                },
+                {
+                    "_tend": "1995-08-04",
+                    "label": "1994-08-04",
+                    "value": "47518"
+                },
+                {
+                    "_tend": "1996-08-03",
+                    "label": "1995-08-04",
+                    "value": "47917"
+                },
+                {
+                    "_tend": "1997-08-03",
+                    "label": "1996-08-03",
+                    "value": "52255"
+                },
+                {
+                    "_tend": "1998-08-03",
+                    "label": "1997-08-03",
+                    "value": "53747"
+                },
+                {
+                    "_tend": "1999-08-03",
+                    "label": "1998-08-03",
+                    "value": "56032"
+                },
+                {
+                    "_tend": "2000-08-02",
+                    "label": "1999-08-03",
+                    "value": "58299"
+                },
+                {
+                    "_tend": "2001-08-02",
+                    "label": "2000-08-02",
+                    "value": "60098"
+                },
+                {
+                    "_tend": "2015-12-02",
+                    "label": "2001-08-02",
+                    "value": "59755"
+                }
+            ]
+      }
+
+  });
+revenueChart.render();
+})
+
+
+
+</script>
+</head>
+<body>
+  <div id="chartContainer"></div>
+</body>
+ 

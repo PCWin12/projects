@@ -1,0 +1,9 @@
+
+
+Starting with the winter03 solution from the homework 5 page. First I tried to implement this in a way that at the point where acceptor is used I tried to use call/cc to save the program state but I arrived at the design problem where the acceptor fucntion is embedded in an lambda fucntion and passed as an argument to another function. Here I wasn't able to find any logic of backtracking.
+
+matcher frag1 (lambda (frag1)
+				(tail-matcher frag1 backtrack)
+
+I either need to find a work around of not using lambda function and going till the end of the pat and then backtrack but that made the things worst. I tried to implement the backtracker logic for that it soon got very comlicated. Then I figured out that rather then figuring out the backtracker logic I can just implement saving state mechanism in the acceptor function. This way I can keep the program as it is and it also follows the backtracking mechanism. Also the accept fucntion takes frag as an argument which exactly what I need to save the program execution state. So every call to acceptor function is actaully a backtracking snapshot point, if the match is acceptable then no need to back track other wise just use the backtraker appended at the end of the list.(as seem from the backtrack implementation). Replacing the matcher by not taking an acceptor function as argument was super easy using the proxy function.
+

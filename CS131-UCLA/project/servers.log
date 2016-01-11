@@ -1,0 +1,86 @@
+DEBUG:root:Alfred Initiated
+DEBUG:root:Powell Initiated
+DEBUG:root:Hamilton Initiated
+DEBUG:root:Bolden Initiated
+DEBUG:root:Parker Initiated
+DEBUG:root:Alfred Initiated
+DEBUG:root:Alfred Initiated
+DEBUG:root:Alfred Initiated
+DEBUG:root:Powell Initiated
+DEBUG:root:Hamilton Initiated
+DEBUG:root:Bolden Initiated
+DEBUG:root:Parker Initiated
+DEBUG:root:Alfred's number of Users: 0
+DEBUG:root:Alfred Recieved => a
+DEBUG:root:Invalid request from client
+DEBUG:root:Alfred Recieved => b
+DEBUG:root:Invalid request from client
+DEBUG:root:Alfred Recieved => IAMAT kiwi.cs.ucla.edu +34.068930-118.445127 1400794645.392014450
+DEBUG:root:Powell's number of Users: 0
+DEBUG:root:Powell Recieved => AT Alfred 24828886.73511338 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Powell boradcasting location to Bolden
+DEBUG:root:Parker's number of Users: 0
+DEBUG:root:Parker Recieved => AT Alfred 24828886.73511338 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Parker boradcasting location to Bolden
+DEBUG:root:Parker boradcasting location to Hamilton
+DEBUG:root:Bolden's number of Users: 0
+DEBUG:root:Bolden's number of Users: 1
+DEBUG:root:Bolden Recieved => AT Alfred 24828886.73511338 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Bolden boradcasting location to Parker
+DEBUG:root:Bolden boradcasting location to Powell
+DEBUG:root:Bolden Recieved => AT Alfred 24828886.73511338 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Hamilton's number of Users: 0
+DEBUG:root:Powell's number of Users: 1
+DEBUG:root:Parker's number of Users: 1
+DEBUG:root:Hamilton Recieved => AT Alfred 24828886.73511338 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Hamilton boradcasting location to Parker
+DEBUG:root:Powell Recieved => AT Alfred 24828886.73511338 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Parker Recieved => AT Alfred 24828886.73511338 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Parker's number of Users: 2
+DEBUG:root:Parker Recieved => AT Alfred 24828886.73511338 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Hamilton's number of Users: 1
+DEBUG:root:Hamilton Recieved => WHATSAT kiwi.cs.ucla.edu 10 5
+DEBUG:root:Alfred Initiated
+DEBUG:root:Powell Initiated
+DEBUG:root:Hamilton Initiated
+DEBUG:root:Bolden Initiated
+DEBUG:root:Parker Initiated
+DEBUG:root:Alfred's number of Users: 0
+DEBUG:root:Hamilton's number of Users: 0
+DEBUG:root:Alfred Recieved => IAMAT kiwi.cs.ucla.edu +34.068930-118.445127 1400794645.392014450
+DEBUG:root:Powell's number of Users: 0
+DEBUG:root:Parker's number of Users: 0
+DEBUG:root:Parker Recieved => AT Alfred 24829041.45713544 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Parker boradcasting location to Bolden
+DEBUG:root:Parker boradcasting location to Hamilton
+DEBUG:root:Powell Recieved => AT Alfred 24829041.45713544 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Powell boradcasting location to Bolden
+DEBUG:root:Bolden's number of Users: 0
+DEBUG:root:Hamilton's number of Users: 1
+DEBUG:root:Bolden Recieved => AT Alfred 24829041.45713544 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Bolden boradcasting location to Parker
+DEBUG:root:Bolden boradcasting location to Powell
+DEBUG:root:Hamilton Recieved => AT Alfred 24829041.45713544 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Hamilton boradcasting location to Parker
+DEBUG:root:Bolden's number of Users: 1
+DEBUG:root:Powell's number of Users: 1
+DEBUG:root:Parker's number of Users: 1
+DEBUG:root:Bolden Recieved => AT Alfred 24829041.45713544 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Parker's number of Users: 2
+DEBUG:root:Parker Recieved => AT Alfred 24829041.45713544 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Powell Recieved => AT Alfred 24829041.45713544 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Parker Recieved => AT Alfred 24829041.45713544 kiwi.cs.ucla.edu 34.068930 -118.445127 1400794645.39201450
+DEBUG:root:Hamilton Recieved => WHATSAT kiwi.cs.ucla.edu 10 5
+DEBUG:root:Alfred Initiated
+DEBUG:root:Powell Initiated
+DEBUG:root:Hamilton Initiated
+DEBUG:root:Bolden Initiated
+DEBUG:root:Parker Initiated
+DEBUG:root:Alfred's number of Users: 0
+DEBUG:root:Alfred Recieved => a
+DEBUG:root:Invalid request from client
+DEBUG:root:Hamilton's number of Users: 0
+DEBUG:root:Hamilton Recieved => w
+DEBUG:root:Invalid request from client
+DEBUG:root:Hamilton Recieved => b
+DEBUG:root:Invalid request from client

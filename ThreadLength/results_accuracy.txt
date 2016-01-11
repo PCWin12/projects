@@ -1,0 +1,3 @@
+Total Instances : 830
+Different bins: 408
+Accuracy: 50.843373494

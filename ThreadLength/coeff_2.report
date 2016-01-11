@@ -1,0 +1,19 @@
+
+Linear Regression Model
+
+threadLength =
+
+     -1.5132 * binnedTimeDiff2 +
+     30.0479 * arrivalPattern1 +
+     -3.304  * arrivalPattern2 +
+      0.0085 * mutualInteractions1 +
+      0.0172 * mutualInteractions2 +
+      0.0255 * numWords1 +
+      3.7922 * question1 +
+     -7.8451 * overlapPrevious1 +
+     -3.0156 * lengthiness1 +
+     -3.6923 * formatPunctuation2 +
+     -1.8884 * averageSentiment +
+     10.2174 * participants +
+     -0.092  * totalLinks +
+     -0.2837

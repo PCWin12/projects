@@ -1,0 +1,20 @@
+
+Linear Regression Model
+
+threadLength =
+
+      0.0025 * threadID +
+      1.1275 * binnedTimeDiff1 +
+     -1.4286 * binnedTimeDiff2 +
+     13.1045 * arrivalPattern1 +
+     -1.6383 * arrivalPattern2 +
+     -0.4865 * posterInteractions2 +
+      0.0073 * mutualInteractions1 +
+      0.0252 * mutualInteractions2 +
+      2.8493 * question1 +
+      6.4631 * exclaim2 +
+     -1.1882 * timeliness1 +
+     -1.1732 * formatCapitals2 +
+      7.7593 * participants +
+     -0.1155 * totalLinks +
+    -41.6737

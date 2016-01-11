@@ -1,0 +1,14 @@
+
+Linear Regression Model
+
+threadLength =
+
+    -19.589  * arrivalPattern1 +
+      2.0304 * arrivalPattern2 +
+     -0.3372 * posterInteractions2 +
+      0.0074 * mutualInteractions1 +
+      0.0204 * mutualInteractions2 +
+      4.3412 * question1 +
+     -2.4762 * timeliness1 +
+     -2.3578 * timeliness2 +
+      8.7978

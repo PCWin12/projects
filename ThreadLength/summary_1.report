@@ -1,0 +1,11 @@
+=== Summary ===
+
+Correlation coefficient                  0.2151
+Class complexity | order 0             579.6618 bits      3.4919 bits/instance
+Class complexity | scheme             2841.2026 bits     17.1157 bits/instance
+Complexity improvement     (Sf)      -2261.5408 bits    -13.6237 bits/instance
+Mean absolute error                      8.3193
+Root mean squared error                 11.358 
+Relative absolute error                145.291  %
+Root relative squared error            126.6843 %
+Total Number of Instances              166     

@@ -1,0 +1,53 @@
+Fold No.: 0
+	 arrivalPattern1  : 13.1045
+	 participants  : 7.7593
+	 exclaim2  : 6.4631
+	 question1  : 2.8493
+	 arrivalPattern2  : 1.6383
+	 binnedTimeDiff2  : 1.4286
+	 timeliness1  : 1.1882
+	 formatCapitals2  : 1.1732
+	 binnedTimeDiff1  : 1.1275
+	 posterInteractions2  : 0.4865
+Fold No.: 1
+	 onThreadTopic2  : 10.3964
+	 overlapPrevious2  : 10.2263
+	 exclaim2  : 6.8151
+	 participants  : 5.576
+	 question1  : 3.9034
+	 timeliness2  : 1.6357
+	 timeliness1  : 1.4686
+	 sentiment2  : 1.0787
+	 totalLinks  : 0.1205
+	 mutualInteractions2  : 0.0213
+Fold No.: 2
+	 arrivalPattern1  : 30.0479
+	 participants  : 10.2174
+	 overlapPrevious1  : 7.8451
+	 question1  : 3.7922
+	 formatPunctuation2  : 3.6923
+	 arrivalPattern2  : 3.304
+	 lengthiness1  : 3.0156
+	 averageSentiment  : 1.8884
+	 binnedTimeDiff2  : 1.5132
+	 totalLinks  : 0.092
+Fold No.: 3
+	 arrivalPattern1  : 19.589
+	 question1  : 4.3412
+	 timeliness1  : 2.4762
+	 timeliness2  : 2.3578
+	 arrivalPattern2  : 2.0304
+	 posterInteractions2  : 0.3372
+	 mutualInteractions2  : 0.0204
+	 mutualInteractions1  : 0.0074
+Fold No.: 4
+	 arrivalPattern1  : 14.608
+	 exclaim2  : 7.7586
+	 arrivalPattern2  : 2.0156
+	 lengthiness1  : 1.7862
+	 averageSentiment  : 1.641
+	 timeliness2  : 0.9557
+	 binnedTimeDiff2  : 0.7209
+	 totalLinks  : 0.1475
+	 mutualInteractions2  : 0.0217
+	 mutualInteractions1  : 0.0055

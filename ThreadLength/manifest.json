@@ -1,0 +1,8 @@
+[
+    {
+        "folds": 5,
+        "data_file": ["Digital_0.arff" , "train.arff"],
+        "step":20,
+        "top_n": 10
+    }
+]

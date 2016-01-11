@@ -1,0 +1,17 @@
+
+Linear Regression Model
+
+threadLength =
+
+     -1.0787 * sentiment2 +
+      0.0108 * mutualInteractions1 +
+      0.0213 * mutualInteractions2 +
+      3.9034 * question1 +
+      6.8151 * exclaim2 +
+     10.3964 * onThreadTopic2 +
+    -10.2263 * overlapPrevious2 +
+     -1.4686 * timeliness1 +
+     -1.6357 * timeliness2 +
+      5.576  * participants +
+     -0.1205 * totalLinks +
+     -2.8791

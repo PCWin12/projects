@@ -50,7 +50,8 @@ If.prototype.eval = function() {
 
 Fun.prototype.eval = function(args) {
 	if(args === undefined) {
-		var t_env = JSON.parse(JSON.stringify(env));
+		//var t_env = JSON.parse(JSON.stringify(merge_options(env, temp_env)));
+		var t_env = Object.create(merge_options(env, this.env, temp_env))
 		return new Closure(this.xs, this.e, t_env);
 	}
 	if(args.length !== this.xs.length){
@@ -68,7 +69,9 @@ Fun.prototype.eval = function(args) {
 
 Closure.prototype.eval = function(args) {
 	if(args === undefined) {
-		var t_env = JSON.parse(JSON.stringify(env));
+		//var t_env = JSON.parse(JSON.stringify(merge_options(env, this.env, temp_env))); // Merge two dictionaries
+		var t_env = Object.create(merge_options(env, this.env, temp_env))
+
 		return new Closure(this.xs, this.e, t_env);
 	}
 	if(args.length !== this.xs.length){
@@ -195,6 +198,17 @@ function isBoolean(bool){
 
 function isString(str){
 	return "string" === typeof str;
+};
+
+
+function merge_options(obj1,obj2,obj4){
+    var obj3 = {};
+    for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
+    for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
+    if(obj4!=undefined){
+   			for (var attrname in obj4) { obj3[attrname] = obj4[attrname]; }
+    }
+return obj3;
 };
 
 function interp(ast) {

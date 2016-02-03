@@ -35,8 +35,6 @@ var many = function (){
         for( i = 0 ; i < arguments[0].length ; i++){
            env.push([]);
             if(!matchValue(arguments[0][i] , many_arg)){
-          //      env[env.length-1] = [env[env.length-1]]
-       //         return i;
                 env.pop();
                 break;
             }
@@ -50,7 +48,6 @@ var many = function (){
             env[init_len].push(temp_list);
         }
         env = env.splice(0, init_len+1);
-        //env[env.length-1] = [env[env.length-1]]
         return i;
     }
 }
@@ -108,9 +105,6 @@ Array.prototype.match = function(other) {
                         i=temp+i -1;
                         j++;
                         continue;
-                 //       if(i>=this.length){
-                   //         break;
-                      //  }
                     }
                 }
 				if(!matchValue(this[i],other[j])){

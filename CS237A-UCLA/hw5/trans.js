@@ -4,30 +4,60 @@
 /**
  * default classes
  * */
+function fixMethodNames(m) {
+    switch (m.trim()) {
+        case "+" :
+            return "plus__";
+            break;
+        case "-" :
+            return "minus__";
+            break;
+        case "/" :
+            return "div__";
+            break;
+        case "*" :
+            return "mul__";
+            break;
+        case "%" :
+            return "mod__";
+            break;
+        case "==" :
+            return "eq__";
+            break;
+        case "!=" :
+            return "noteq__";
+            break;
+        case ">" :
+            return "greaterthan__";
+            break;
+        case "<" :
+            return "lessthan__";
+            break;
+        default:
+            return m + "_";
+    }
+};
+
 function Obj() {
 };
 Obj.prototype.init_ = function () {
     return this;
 };
 Obj.prototype.plus__ = function (x) {
-    this.x = this.x + x.x;
-    return this;
+    return this.new( this.x + x.x);
 };
 Obj.prototype.minus__ = function (x) {
-    this.x = this.x - x.x;
-    return this;
+    return this.new( this.x - x.x);
 };
 Obj.prototype.mul__ = function (x) {
-    this.x = this.x * x.x;
-    return this;
+    return this.new( this.x * x.x);
 };
 Obj.prototype.div__ = function (x) {
-    this.x = this.x / x.x;
-    return this;
+    return this.new(  this.x / x.x);
 };
 Obj.prototype.mod__ = function (x) {
-    this.x = this.x % x.x;
-    return this;
+    return this.new( this.x % x.x);
+    
 };
 Obj.prototype.eq__ = function (x) {
     if(this.x === x.x){
@@ -63,6 +93,9 @@ Num.prototype.init_ = function (x) {
     this.x = x;
     return this;
 };
+Num.prototype.new = function(x){
+    return new Num().init_(x)
+};
 
 
 function Str() {
@@ -72,6 +105,9 @@ Str.prototype.init_ = function (x) {
     this.x = x;
     return this;
 };
+Str.prototype.new = function(x){
+    return new Str().init_(x)
+};
 
 function Null() {
 };
@@ -79,6 +115,9 @@ Null.prototype = Object.create(Obj.prototype);
 Null.prototype.init_ = function (x) {
     this.x = x;
     return this;
+};
+Null.prototype.new = function(x){
+    return new Null().init_(x)
 };
 
 function Bool() {
@@ -96,6 +135,9 @@ True.prototype.init_ = function (x) {
     this.x = x;
     return this;
 };
+True.prototype.new = function(x){
+    return (x) ? new True().init_(x) : new False().init_(x);
+};
 
 function False() {
 };
@@ -105,6 +147,10 @@ False.prototype.init_ = function (x) {
     return this;
 };
 
+False.prototype.new = function(x){
+    return (x) ? new True().init_(x) : new False().init_(x);
+};
+
 function Block() {
 };
 Block.prototype = Object.create(Obj.prototype);
@@ -112,9 +158,16 @@ Block.prototype.init_ = function (x) {
     this._x = x;
     return this;
 };
+Block.prototype.setContext_ = function(c ){
+    this.c = c;
+    return this;
+}
 Block.prototype.call_ = function () {
-    return this._x.apply(this, arguments)
+    return this._x.apply(this.c, arguments)
 };
+function Ran(x,y){
+    this.x=x;this.y=y;return this;
+}
 
 /**
  * Implementation
@@ -142,6 +195,7 @@ function findVar(c, x) {
     }
     return false;
 };
+var ar = 0;
 
 BlockLit.prototype.eval = function (set) {
     var fun = "function(" + this.xs.join(",") + "){";
@@ -165,7 +219,7 @@ BlockLit.prototype.eval = function (set) {
     if (!foundreturn) {
         fun = fun + "return new Null().init_(null);"
     }
-    fun = fun + "}";
+    fun = "new Block().init_(" + fun + "}" + ").setContext_(this)";
     //if(set === undefined){
       //  var localname  =  "tmp_" + name++;
        // fun = "var " +localname +" = "+ fun+ ";";
@@ -226,7 +280,7 @@ Send.prototype.eval = function (set) {
          send = "var " +localname +" = "+ send+ ";";
          send  = send + localname;
     }
-    if(this.m === "call"){
+  /*  if(this.m === "call"){
         send = send + "." + "apply(this";
         if(this.es.length>0){
             send = send+",";
@@ -243,7 +297,7 @@ Send.prototype.eval = function (set) {
         }
 
     }else {
-        send = send + "." + fixMethodNames(this.m) + "(";
+    */    send = send + "." + fixMethodNames(this.m) + "(";
         var args = "";
         for (var j = 0; j < this.es.length; j++) {
             args = args + this.es[j].eval(set) + ","
@@ -252,53 +306,19 @@ Send.prototype.eval = function (set) {
             args = args.substring(0, args.length - 1)
         }
         send = send + args + ")";
-    }
+
     return send;
 };
 
-
-Return.prototype.eval = function (set) {
+Return.prototype.eval = function (set, vale) {
     if(set !== true)return "return " + this.e.eval();
-    else return "throw " +  this.e.eval();
+    else return "throw " +  "new Ran(" + this.e.eval() + ", ar__)";
 };
 
 InstVarAssign.prototype.eval = function () {
     return "this." + this.x + " = " + this.e.eval()
 };
 
-function fixMethodNames(m) {
-    switch (m.trim()) {
-        case "+" :
-            return "plus__";
-            break;
-        case "-" :
-            return "minus__";
-            break;
-        case "/" :
-            return "div__";
-            break;
-        case "*" :
-            return "mul__";
-            break;
-        case "%" :
-            return "mod__";
-            break;
-        case "==" :
-            return "eq__";
-            break;
-        case "!=" :
-            return "noteq__";
-            break;
-        case ">" :
-            return "greaterthan__";
-            break;
-        case "<" :
-            return "lessthan__";
-            break;
-        default:
-            return m + "_";
-    }
-};
 
 MethodDecl.prototype.eval = function () {
     var method = "";
@@ -309,7 +329,7 @@ MethodDecl.prototype.eval = function () {
 
 //        }else{
         method = this.C + ".prototype." + fixMethodNames(this.m) + "=function(" + this.xs.toString() +
-            "){ try{";
+            "){ var ar__ = ar++ ; try{";
         //      }
         var foundreturn = false;
         for (var s = 0; s < this.ss.length; s++) {
@@ -321,7 +341,14 @@ MethodDecl.prototype.eval = function () {
         if (!foundreturn) {
             method = method + "return this;"
         }
-        method = method + " } catch(err){ throw err;}};";
+        method = method + " } catch(err){ " +
+            "if(err instanceof Ran){ " +
+            "   if(err.y === ar__ ){" +
+            "   return err.x}else{" +
+            "                   throw err}" +
+            "}" +
+            "throw err;}" +
+            "};";
         methods.push(this.C + "." + fixMethodNames(this.m))
         currentClass.pop()
 
@@ -417,3 +444,70 @@ function trans(ast) {
     throw new TODO('implement translation for ' + ast.constructor.name);
 };
 
+try {
+    True.prototype.thenElse_ = function(tb, fb) {
+        var ar__ = ar++;
+        try {
+            return tb.call_();
+        } catch (err) {
+            if (err instanceof Ran) {
+                if (err.y === ar__) {
+                    return err.x
+                } else {
+                    throw err
+                }
+            }
+            throw err;
+        }
+    };;
+    False.prototype.thenElse_ = function(tb, fb) {
+        var ar__ = ar++;
+        try {
+            return fb.call_();
+        } catch (err) {
+            if (err instanceof Ran) {
+                if (err.y === ar__) {
+                    return err.x
+                } else {
+                    throw err
+                }
+            }
+            throw err;
+        }
+    };;
+    Num.prototype.fact_ = function() {
+        var ar__ = ar++;
+        try {
+            this.eq__(new Num().init_(0)).thenElse_(new Block().init_(function() {
+                throw new Ran(new Num().init_(1), ar__);
+            }).setContext_(this), new Block().init_(function() {
+                throw new Ran(this.mul__(this.minus__(new Num().init_(1)).fact_()), ar__);
+            }).setContext_(this));
+            return this;
+        } catch (err) {
+            if (err instanceof Ran) {
+                if (err.y === ar__) {
+                    return err.x
+                } else {
+                    throw err
+                }
+            }
+            throw err;
+        }
+    };;
+    var tmp_22 = new Num().init_(5).fact_();
+    if (tmp_22 === undefined) {
+        tmp_22 = null
+    }
+    if (tmp_22 instanceof Num || tmp_22 instanceof Str || tmp_22 instanceof True || tmp_22 instanceof False || tmp_22 instanceof Null) {
+        tmp_22 = tmp_22.x;
+    };
+    tmp_22;
+} catch (err) {
+    if (err === undefined) {
+        null
+    }
+    if (err instanceof Num || err instanceof Str || err instanceof True || err instanceof False || err instanceof Null) {
+        err.x;
+    }
+};

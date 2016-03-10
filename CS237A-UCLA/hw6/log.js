@@ -2,7 +2,7 @@
 // Part I: Rule.prototype.makeCopyWithFreshVarNames() and
 //         {Clause, Var}.prototype.rewrite(subst)
 // -----------------------------------------------------------------------------
-var current = 0
+var current = 0;
 Var.prototype.freshnames = function(){
          return new Var( this.name + "_" + current)
 };
@@ -23,15 +23,17 @@ Rule.prototype.makeCopyWithFreshVarNames = function() {
   for(var  i=0 ; i< this.body.length ; i++){
     temp_body.push(this.body[i].freshnames());
   }
-  rule.body = temp_body
+  rule.body = temp_body;
   return rule;
 };
 
 Clause.prototype.rewrite = function(subst, name) {
+  var temp = [];
   for(var  i=0 ; i< this.args.length ; i++){
-    this.args[i] = this.args[i].rewrite(subst , name);
+    //this.args[i]
+        temp[i]= this.args[i].rewrite(subst , name);
   }
-  return this;
+  return new Clause(this.name , temp);
 };
 
 Var.prototype.rewrite = function(subst, name) {
@@ -42,7 +44,7 @@ Var.prototype.rewrite = function(subst, name) {
     }
   }
   if(result === undefined){
-    return this;
+    return new Var(this.name);
   }else {
     return result;
   }
@@ -98,7 +100,8 @@ Subst.prototype.unify = function(term1, term2) {
       if (term1.name === term2.name) {
         //return this;
       } else {
-        this.bind(term1.name , term2)
+        this.unify(var1 , var2)
+ //       this.bind(term1.name , term2)
       }
     }else{
       this.bind(term1.name , term2)

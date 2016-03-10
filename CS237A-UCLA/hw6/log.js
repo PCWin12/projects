@@ -2,9 +2,9 @@
 // Part I: Rule.prototype.makeCopyWithFreshVarNames() and
 //         {Clause, Var}.prototype.rewrite(subst)
 // -----------------------------------------------------------------------------
-
+var current = 0
 Var.prototype.freshnames = function(){
-         return new Var( this.name + "_")
+         return new Var( this.name + "_" + current)
 };
 
 Clause.prototype.freshnames = function(){
@@ -16,6 +16,7 @@ return new Clause(this.name , temp_args)
 };
 
 Rule.prototype.makeCopyWithFreshVarNames = function() {
+  current++;
   var rule = new Rule();
   rule.head = this.head.freshnames();
   var temp_body = [];
@@ -166,14 +167,14 @@ Iterator.prototype.next = function(sbst){
   for(var i =rule_look  ; i< this.rules.length ; i++) {
     if (current_goal.name === this.rules[i].head.name && current_goal.args.length === this.rules[i].head.args.length) {
       this.stack.push([[current_goal].concat(this.goal), current_subst.clone(), i + 1]);
-      var rule = this.rules[i].makeCopyWithFreshVarNames();
+      this.rules[i] = this.rules[i].makeCopyWithFreshVarNames();
       var temp_sbst = current_subst.clone();
       try {
-        current_subst.unify(current_goal, rule.head);
-        if(rule.body.length === 0 && this.goal.length === 0){
+        current_subst.unify(current_goal, this.rules[i].head);
+        if(this.rules[i].body.length === 0 && this.goal.length === 0){
           return current_subst;
         }
-        this.goal = this.goal.concat(rule.body)
+        this.goal = this.goal.concat(this.rules[i].body.slice().reverse());
         return this.next(current_subst);
       }catch(e) {
         current_subst = temp_sbst;

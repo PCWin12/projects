@@ -185,7 +185,9 @@ Iterator.prototype.next = function(sbst){
       }
     }
   }
-
+if(this.goal.length !== 0 ){
+  return false
+}
   if(this.stack.length !== 0 ){
     return this.next();
   }

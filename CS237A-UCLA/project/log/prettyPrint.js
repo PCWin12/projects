@@ -1,0 +1,233 @@
+JS.prettyPrintValue = function(x) {
+  return x instanceof AST ?
+      L.prettyPrintAST(x) :
+      String(x);
+};
+
+// --------------------------------------------------------------
+
+L.prettyPrintValue = function(iter) {
+  if (!iter || !iter.next) {
+    throw new Error('expected iterator but got ' + JSON.stringify(iter));
+  }
+  var output = [];
+  var N = 5;
+  var soln;
+  for (var idx = 0; idx < N; idx++) {
+    soln = iter.next();
+    if (idx > 0) {
+      output.push('\n');
+    }
+    if (!soln) {
+      output.push('** no more answers **');
+      break;
+    } else if (!(soln instanceof Subst)) {
+      throw new Error('expected substitution but got ' + JSON.stringify(soln));
+    } else {
+      output.push(soln.toString());
+    }
+  }
+  if (soln) {
+    output.push('\n...');
+  }
+  return output.join('');
+};
+
+Clause.prototype.toString = function() {
+  if (this.name === '_nil') {
+    return '[]';
+  } else if (this.name === '_cons') {
+    var strm = new IndentingOutputStream();
+    strm.write('[');
+    var first = true;
+    var curr = this;
+    while (curr.name === '_cons') {
+      if (first) {
+        first = false;
+      } else {
+        strm.write(',');
+      }
+      strm.write(curr.args[0].toString());
+      curr = curr.args[1];
+    }
+    if (curr.name !== '_nil') {
+      strm.write('|');
+      strm.write(curr.toString());
+    }
+    strm.write(']');
+    return strm.contents();
+  } else {
+    return this.args.length === 0 ?
+      this.name :
+      this.name + '(' + this.args.map(arg => arg.toString()).join(', ') + ')';
+  }
+};
+
+Var.prototype.toString = function() {
+  return this.name;
+};
+
+Num.prototype.toString = function() {
+  return this.x;
+};
+// --------------------------------------------------------------
+
+L.prettyPrintAST = function(ast) {
+  var strm = new IndentingOutputStream();
+  ast.prettyPrint(strm);
+  return strm.contents();
+};
+
+AST.prototype.prettyPrint = function(strm) {
+  throw new Error(this.constructor.name + ' is missing an implementation for prettyPrint(strm)');
+};
+
+Program.prototype.prettyPrint = function(strm) {
+  strm.indentFromHere();
+  strm.write('new Program(');
+  strm.nl();
+  strm.write('/* rules */');
+  strm.nl();
+  prettyPrintList(this.rules, strm);
+  strm.write(',');
+  strm.nl();
+  strm.write('/* query */');
+  strm.nl();
+  prettyPrintList(this.query, strm);
+  strm.write(')');
+  strm.dedent();
+};
+
+Rule.prototype.prettyPrint = function(strm) {
+  strm.indentFromHere();
+  strm.write('new Rule(');
+  strm.nl();
+  this.head.prettyPrint(strm);
+  strm.write(', /* :- */');
+  if (this.body.length > 0) {
+    strm.nl();
+  } else {
+    strm.write(' ');
+  }
+  prettyPrintList(this.body, strm);
+  strm.write(')');
+  strm.dedent();
+};
+
+Clause.prototype.prettyPrint = function(strm) {
+  strm.write('new Clause("' + this.name + '"');
+  strm.write(', [');
+  this.args.forEach((arg, idx) => {
+    if (idx > 0) {
+      strm.write(', ');
+    }
+    this.args[idx].prettyPrint(strm);
+  });
+  strm.write('])');
+};
+
+Var.prototype.prettyPrint = function(strm) {
+  strm.write('new Var("' + this.name + '")');
+};
+Add.prototype.prettyPrint = function(strm) {
+  strm.write('new Add( ');
+  strm.indentFromHere();
+  this.e1.prettyPrint(strm)
+  strm.dedent();
+  strm.write(' , ')
+  strm.indentFromHere();
+  this.e2.prettyPrint(strm);
+  strm.dedent();
+  strm.write(' )')
+};
+
+
+
+
+Sub.prototype.prettyPrint = function(strm) {
+  strm.write('new Sub( ');
+  strm.indentFromHere();
+  this.e1.prettyPrint(strm)
+  strm.dedent();
+  strm.write(' , ')
+  strm.indentFromHere();
+  this.e2.prettyPrint(strm);
+  strm.dedent();
+  strm.write(' )')
+};
+
+Mul.prototype.prettyPrint = function(strm) {
+  strm.write('new Mul( ');
+  strm.indentFromHere();
+  this.e1.prettyPrint(strm)
+  strm.dedent();
+  strm.write(' , ')
+  strm.indentFromHere();
+  this.e2.prettyPrint(strm);
+  strm.dedent();
+  strm.write(' )')
+};
+Pow.prototype.prettyPrint = function(strm) {
+  strm.write('new Pow( ');
+  strm.indentFromHere();
+  this.e1.prettyPrint(strm)
+  strm.dedent();
+  strm.write(' , ')
+  strm.indentFromHere();
+  this.e2.prettyPrint(strm);
+  strm.dedent();
+  strm.write(' )')
+};
+Mod.prototype.prettyPrint = function(strm) {
+  strm.write('new Mod( ');
+  strm.indentFromHere();
+  this.e1.prettyPrint(strm)
+  strm.dedent();
+  strm.write(' , ')
+  strm.indentFromHere();
+  this.e2.prettyPrint(strm);
+  strm.dedent();
+  strm.write(' )')
+};
+
+Div.prototype.prettyPrint = function(strm) {
+  strm.write('new Div( ');
+  strm.indentFromHere();
+  this.e1.prettyPrint(strm)
+  strm.dedent();
+  strm.write(' , ')
+  strm.indentFromHere();
+  this.e2.prettyPrint(strm);
+  strm.dedent();
+  strm.write(' )')
+};
+Comp.prototype.prettyPrint = function(strm) {
+  strm.write('new Comp( ' + this.op + ' , ');
+  strm.indentFromHere();
+  this.e1.prettyPrint(strm);
+  strm.dedent();
+  strm.write(' , ');
+  strm.indentFromHere();
+  this.e2.prettyPrint(strm);
+  strm.dedent();
+  strm.write(' )');
+};
+
+
+Num.prototype.prettyPrint = function(strm) {
+  strm.write('new Num("' + this.x + '")');
+};
+function prettyPrintList(xs, strm) {
+  strm.write('[');
+  strm.indentToHere();
+  xs.forEach((x, idx) => {
+    if (idx > 0) {
+      strm.write(',');
+      strm.nl();
+    }
+    x.prettyPrint(strm);
+  });
+  strm.dedent();
+  strm.write(']');
+}
+

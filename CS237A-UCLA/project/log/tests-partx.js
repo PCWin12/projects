@@ -163,8 +163,21 @@ tests(
         name: 'not 1',
         code: 'p.\n~(2 == 4)?',
         expected: makeIterator({})
+    },
+    {
+        name: 'not 2',
+        code: 'unmarriedstudent(X):- ~(married(X)), student(X).\nstudent(joe).\nmarried(john).\nunmarriedstudent(john)?',
+        expected: makeIterator()
+    },
+    {
+        name: 'not 3',
+        code: 'man(jim).\nman(fred).\nwoman(X):- ~( man(X) ).\nwoman(merry)?',
+        expected: makeIterator({})
+    },
+    {
+        name: 'Primal Check using not, arithmetic and relational operators ',
+        code: 'isprime(2).\nisprime(3).\nisprime(P) :- P > 3, P % 2 != 0, ~(hasfactor(P,3)).\nhasfactor(N,L) :- N % L == 0.\nhasfactor(N,L) :- L * L < N, L2 is L + 2, hasfactor(N,L2).\nisprime(4111)?',
+        expected: makeIterator({})
     }
-
-
 );
 

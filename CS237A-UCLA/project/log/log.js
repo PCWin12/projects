@@ -281,6 +281,10 @@ Iterator.prototype.next = function (sbst) {
         var iter = new Iterator(this.rules , [current_goal.args[0]]);
         var sol = iter.next(current_subst.clone());
         if (sol) {
+            if (this.stack.length !== 0) {
+                this.goal = [];
+                return this.next();
+            }
             return false;
         } else {
             if (this.goal.length === 0) {

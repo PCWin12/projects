@@ -1,5 +1,5 @@
 <html>
-  <head>
+<head>
     <title>HW6: Logic Programming Language</title>
 
     <link rel="stylesheet" href="../lib/codemirror.css"></link>
@@ -34,6 +34,7 @@ L {
 
   Clause  (a clause)
     = "is" "(" variable "," AddExpr ")"  -- infix
+    | "not" "(" Clause ")"   -- not
     | symbola "(" Term "," Term ")" -- arth
     | AddExpr binop AddExpr -- binop
     | variable "is" Term -- infixis
@@ -41,6 +42,7 @@ L {
     | symbol                -- noArgs
     | "!"   -- cut
     | "~" "(" Clause ")"   -- neg
+
 
   Clauses
     = NonemptyListOf<Clause, ",">
@@ -113,522 +115,668 @@ L {
 
 }
 
+
+
     </script>
     <script src="../lib/ohm.min.js"></script>
 
     <script src="L.js"></script>
     <script src="classes.js"></script>
     <script src="prettyPrint.js"></script>
-  </head>
-  <body>
-    <everything>
-      <header>
+</head>
+<body>
+<everything>
+    <header>
         <part>Part IV:</part>
         <descr>Logic Programming</descr>
         <detail>(an interpreter)</detail>
-      </header>
-      <abstract>
+    </header>
+    <abstract>
         In Part IV of this class, we&rsquo;ll &ldquo;prototype&rdquo; a logic programming language
         that is similar to <a href="http://en.wikipedia.org/wiki/Prolog">Prolog</a>. We&rsquo;ll do
         this with an interpreter, just like you did for the functional language in
         <a href="../func/index.html">Homeworks 1 and 2</a>.
-      </abstract>
-      <section>
+    </abstract>
+    <section>
         <sectionHeader>
-          <span>Introduction</span>
+            <span>Introduction</span>
         </sectionHeader>
         <p>
-          Alan Kay likes to talk about moving from &ldquo;how&rdquo; to &ldquo;what&rdquo; in
-          programming. That is, we&rsquo;d like the programmer to merely specify <em>what</em> is
-          desired and have the computer automagically make it so, as opposed to requiring he or she
-          to detail every step required to get there. In a nutshell, this move from
-          &ldquo;how&rdquo; to &ldquo;what&rdquo; is the story of progress in programming languages
-          over time. Even low-level languages like C provide several forms of &ldquo;what&rdquo; as
-          compared with assembly language, e.g., &ldquo;let there be a variable called
-          <code>x</code>,&rdquo; &ldquo;return back to my caller,&rdquo; etc.
+            Alan Kay likes to talk about moving from &ldquo;how&rdquo; to &ldquo;what&rdquo; in
+            programming. That is, we&rsquo;d like the programmer to merely specify <em>what</em> is
+            desired and have the computer automagically make it so, as opposed to requiring he or she
+            to detail every step required to get there. In a nutshell, this move from
+            &ldquo;how&rdquo; to &ldquo;what&rdquo; is the story of progress in programming languages
+            over time. Even low-level languages like C provide several forms of &ldquo;what&rdquo; as
+            compared with assembly language, e.g., &ldquo;let there be a variable called
+            <code>x</code>,&rdquo; &ldquo;return back to my caller,&rdquo; etc.
         </p>
         <p>
-          Prolog can in some ways be viewed as the idea of a &ldquo;what&rdquo; language taken to
-          its <em>logical</em> <sidebar>(Pun intended.)</sidebar> <em>conclusion</em>: programming
-          by specifying. In Prolog, a programmer simply specifies an <em>ontology</em>: a set of
-          entities and their relationships to one another, defined as a set of logical rules. In
-          class, for example, we saw a simple Prolog program whose entities were CS courses at
-          UCLA with a prerequisite relationship defined among them. All computation is performed by
-          answering queries about what is true according to this ontology. Prolog answers queries by
-          searching for a <em>proof</em> (or <em>derivation</em>) using the rules of the ontology.
+            Prolog can in some ways be viewed as the idea of a &ldquo;what&rdquo; language taken to
+            its <em>logical</em>
+            <sidebar>(Pun intended.)</sidebar>
+            <em>conclusion</em>: programming
+            by specifying. In Prolog, a programmer simply specifies an <em>ontology</em>: a set of
+            entities and their relationships to one another, defined as a set of logical rules. In
+            class, for example, we saw a simple Prolog program whose entities were CS courses at
+            UCLA with a prerequisite relationship defined among them. All computation is performed by
+            answering queries about what is true according to this ontology. Prolog answers queries by
+            searching for a <em>proof</em> (or <em>derivation</em>) using the rules of the ontology.
         </p>
         <p>
-          Unfortunately, Prolog does not put programming language designers out of business. By
-          forcing everything to be a &ldquo;what&rdquo; and all computation to proceed via search,
-          many kinds of tasks are unnatural to implement and/or require careful structuring to
-          ensure that Prolog&rsquo;s search will terminate. Further, tasks often require the use of
-          imperative features to obtain reasonable performance. (So don&rsquo;t worry, you can still
-          invent the ultimate &ldquo;what&rdquo; language!)
+            Unfortunately, Prolog does not put programming language designers out of business. By
+            forcing everything to be a &ldquo;what&rdquo; and all computation to proceed via search,
+            many kinds of tasks are unnatural to implement and/or require careful structuring to
+            ensure that Prolog&rsquo;s search will terminate. Further, tasks often require the use of
+            imperative features to obtain reasonable performance. (So don&rsquo;t worry, you can still
+            invent the ultimate &ldquo;what&rdquo; language!)
         </p>
         <p>
-          Nonetheless, Prolog continues to be an inspiration for what declarative programming might
-          be. Further, subsets of Prolog, notably
-          <a href="http://en.wikipedia.org/wiki/Datalog">Datalog</a>, which requires the arguments
-          to predicates to be simple atoms rather than arbitrary terms, have been quite successful
-          in a variety of domains, e.g., access control, program analysis, and data analytics.
-          Datalog provides many of the benefits of Prolog but without the fragility: all Datalog
-          programs are guaranteed to terminate, and the semantics of a Datalog program is completely
-          independent of the underlying search strategy that is used by an implementation.
+            Nonetheless, Prolog continues to be an inspiration for what declarative programming might
+            be. Further, subsets of Prolog, notably
+            <a href="http://en.wikipedia.org/wiki/Datalog">Datalog</a>, which requires the arguments
+            to predicates to be simple atoms rather than arbitrary terms, have been quite successful
+            in a variety of domains, e.g., access control, program analysis, and data analytics.
+            Datalog provides many of the benefits of Prolog but without the fragility: all Datalog
+            programs are guaranteed to terminate, and the semantics of a Datalog program is completely
+            independent of the underlying search strategy that is used by an implementation.
         </p>
-      </section>
-      <section>
+    </section>
+    <section>
         <sectionHeader>
-          <span>Homework 6: A Logic Programming Language</span>
+            <span>Homework 6: A Logic Programming Language</span>
         </sectionHeader>
         <due>
           <span style="font-family: Komika Hand;">Due <b>Thursday, March 10<sup>th</sup></b>,
           at 11:30pm</span><br>
-          Turn in just your <code>log.js</code> through the course page on CCLE.
+            Turn in just your <code>log.js</code> through the course page on CCLE.
         </due>
         <p>
-          Here&rsquo;s what the concrete syntax of our logic programming language looks like, and
-          how we&rsquo;ll represent it as abstract syntax in JavaScript:
-          <table class="syntax">
+            Here&rsquo;s what the concrete syntax of our logic programming language looks like, and
+            how we&rsquo;ll represent it as abstract syntax in JavaScript:
+        <table class="syntax">
             <tr>
-              <th></th>
-              <th>Concrete Syntax</th>
-              <th>JS AST</th>
+                <th></th>
+                <th>Concrete Syntax</th>
+                <th>JS AST</th>
             </tr>
             <tr>
-              <td>
-                <div style="height: 71px;">
-                  p ::=
-                </div>
-              </td>
-              <td valign="middle">
-                <div style="height: 71px;">
-                  r<sub>1</sub> &hellip; r<sub>n</sub>
-                  c<sub>1</sub><code>,</code> &hellip;<code>,</code> c<sub>m</sub> <code>?</code>
-                </div>
-              </td>
-              <td>
-                <sidebar>
-                  A program is any number of <em>rules</em> followed by <em>query</em>, which
-                  consists of one or more <em>clauses</em> followed by a question mark.
-                </sidebar>
-                <div>
-                  <tight>
-                    <codeBlock style="margin: 0; padding: 0; padding-top: 2px;">new Program(
-  [<text>r<sub>1</sub></text>,<text> &hellip;</text>,<text> r<sub>n</sub></text>],
-  [<text>c<sub>1</sub></text>,<text> &hellip;</text>,<text> c<sub>m</sub></text>])</codeBlock>
-                  </tight>
-                </div>
-              </td>
+                <td>
+                    <div style="height: 71px;">
+                        p ::=
+                    </div>
+                </td>
+                <td valign="middle">
+                    <div style="height: 71px;">
+                        r<sub>1</sub> &hellip; r<sub>n</sub>
+                        c<sub>1</sub><code>,</code> &hellip;<code>,</code> c<sub>m</sub> <code>?</code>
+                    </div>
+                </td>
+                <td>
+                    <sidebar>
+                        A program is any number of <em>rules</em> followed by <em>query</em>, which
+                        consists of one or more <em>clauses</em> followed by a question mark.
+                    </sidebar>
+                    <div>
+                        <tight>
+                            <codeBlock style="margin: 0; padding: 0; padding-top: 2px;">new Program(
+                                [
+                                <text>r<sub>1</sub></text>
+                                ,
+                                <text> &hellip;</text>
+                                ,
+                                <text> r<sub>n</sub></text>
+                                ],
+                                [
+                                <text>c<sub>1</sub></text>
+                                ,
+                                <text> &hellip;</text>
+                                ,
+                                <text> c<sub>m</sub></text>
+                                ])
+                            </codeBlock>
+                        </tight>
+                    </div>
+                </td>
             </tr>
             <tr>
-              <td>r ::=</td>
-              <td>
+                <td>r ::=</td>
+                <td>
+                    <multival>
+                        <div>c<code>.</code></div>
+                        <div>c <code>:-</code> c<sub>1</sub><code>,</code> &hellip;<code>,</code>
+                            c<sub>n</sub><code>.</code></div>
+                    </multival>
+                </td>
+                <td>
+                    <div><code>new Rule(</code>c<code>, [])</code></div>
+                    <div><code>new Rule(</code>c<code>, [</code>c<sub>1</sub><code>,</code>
+                        &hellip;<code>,</code> c<sub>n</sub><code>])</code></div>
+                </td>
+            </tr>
+            </tr>
+            <td>c ::=</td>
+            <td>
                 <multival>
-                  <div>c<code>.</code></div>
-                  <div>c <code>:-</code> c<sub>1</sub><code>,</code> &hellip;<code>,</code>
-                    c<sub>n</sub><code>.</code></div>
+                    <div>x<code>(</code>t<sub>1</sub><code>,</code> &hellip;<code>,</code>
+                        t<sub>n</sub><code>)</code></div>
+                    <div>x</div>
                 </multival>
-              </td>
-              <td>
-                <div><code>new Rule(</code>c<code>, [])</code></div>
-                <div><code>new Rule(</code>c<code>, [</code>c<sub>1</sub><code>,</code>
-                  &hellip;<code>,</code> c<sub>n</sub><code>])</code></div>
-              </td>
-            </tr>
-            </tr>
-              <td>c ::=</td>
-              <td>
-                <multival>
-                  <div>x<code>(</code>t<sub>1</sub><code>,</code> &hellip;<code>,</code>
-                    t<sub>n</sub><code>)</code></div>
-                  <div>x</div>
-                </multival>
-              </td>
-              <td>
+            </td>
+            <td>
                 <div><code>new Clause(</code>x<code>, [</code>t<sub>1</sub><code>,</code>
-                  &hellip;<code>,</code> t<sub>n</sub><code>])</code></div>
+                    &hellip;<code>,</code> t<sub>n</sub><code>])</code></div>
                 <div>
-                  <sidebar>
-                    An <em>atom</em> (e.g., <code>cs237a</code>) is just a clause with no arguments.
-                  </sidebar>
-                  <code>new Clause(</code>x<code>, [])</code>
+                    <sidebar>
+                        An <em>atom</em> (e.g., <code>cs237a</code>) is just a clause with no arguments.
+                    </sidebar>
+                    <code>new Clause(</code>x<code>, [])</code>
                 </div>
-              </td>
+            </td>
             </tr>
             <tr>
-              <td>
-                t ::=
-              </td>
-              <td>
-                <multival>
-                  <div>c</div>
-                  <div>X</div>
-                </multival>
-              </td>
-              <td>
-                <div>
-                  <ntext style="opacity: 0.5;">(see above)</ntext>
-                </div>
-                <div><code>new Var(</code>X<code>)</code></div>
-              </td>
+                <td>
+                    t ::=
+                </td>
+                <td>
+                    <multival>
+                        <div>c</div>
+                        <div>X</div>
+                    </multival>
+                </td>
+                <td>
+                    <div>
+                        <ntext style="opacity: 0.5;">(see above)</ntext>
+                    </div>
+                    <div><code>new Var(</code>X<code>)</code></div>
+                </td>
             </tr>
             <tr>
-              <td>x ::=</td>
-              <td>
-                <ntext>an identifier starting with a lower-case letter</ntext>
-              </td>
-              <td>
-                <ntext>a JavaScript string</ntext>
-              </td>
+                <td>x ::=</td>
+                <td>
+                    <ntext>an identifier starting with a lower-case letter</ntext>
+                </td>
+                <td>
+                    <ntext>a JavaScript string</ntext>
+                </td>
             </tr>
             <tr>
-              <td>X ::=</td>
-              <td>
-                <ntext>an identifier starting with an upper-case letter</ntext>
-              </td>
-              <td>
-                <ntext>a JavaScript string</ntext>
-              </td>
+                <td>X ::=</td>
+                <td>
+                    <ntext>an identifier starting with an upper-case letter</ntext>
+                </td>
+                <td>
+                    <ntext>a JavaScript string</ntext>
+                </td>
             </tr>
-          </table>
+        </table>
         </p>
-      </section>
-      <section>
+    </section>
+    <section>
         <sectionHeader>
-          <span>Part I: Manipulating Variables</span>
+            <span>Part I: Manipulating Variables</span>
         </sectionHeader>
         <p>
-	  In the first part of this assignment, you will implement a couple of helper methods that
-          will be used by your interpreter.
+            In the first part of this assignment, you will implement a couple of helper methods that
+            will be used by your interpreter.
         </p>
         <h3>Freshening Up</h3>
         <p>
-	  Implement a method on <code>Rule</code>s called <code>makeCopyWithFreshVarNames()</code>.
-          This method should return a copy of the rule in which all variable names have been
-          replaced with fresh variable names. As we discussed in class, you will want to call this
-          method before unifying a goal with the head of a rule so that the variable names in the
-          rule don&rsquo;t accidentally get confused with the variable names in the goal (and in the
-          surrounding context).
+            Implement a method on <code>Rule</code>s called <code>makeCopyWithFreshVarNames()</code>.
+            This method should return a copy of the rule in which all variable names have been
+            replaced with fresh variable names. As we discussed in class, you will want to call this
+            method before unifying a goal with the head of a rule so that the variable names in the
+            rule don&rsquo;t accidentally get confused with the variable names in the goal (and in the
+            surrounding context).
         </p>
         <h3 id="rewrite">Applying Substitutions</h3>
         <p>
-	  Unification produces a <em>substitution</em>, which is a mapping from variables to
-          <highlight><em>terms</em></highlight>.
-          <sidebar>
-            As shown in the grammar above, a <em>term</em> is either a variable or a clause. Note
-            that the arguments to a clause are themselves arbitrary terms.
-          </sidebar>
-          In your interpreter, substitutions will be represented as instances of the
-          <code>Subst</code> class, which is declared in
-          <a href="classes.js"><code>classes.js</code></a> and supports the following methods:
-          <ul>
-	    <li>
-              <code>lookup(varName)</code> returns the term associated with <code>varName</code>
-              in the substitution, or <code>undefined</code> if <code>varName</code> is not
-              associated with a term.
+            Unification produces a <em>substitution</em>, which is a mapping from variables to
+            <highlight><em>terms</em></highlight>
+            .
+            <sidebar>
+                As shown in the grammar above, a <em>term</em> is either a variable or a clause. Note
+                that the arguments to a clause are themselves arbitrary terms.
+            </sidebar>
+            In your interpreter, substitutions will be represented as instances of the
+            <code>Subst</code> class, which is declared in
+            <a href="classes.js"><code>classes.js</code></a> and supports the following methods:
+        <ul>
+            <li>
+                <code>lookup(varName)</code> returns the term associated with <code>varName</code>
+                in the substitution, or <code>undefined</code> if <code>varName</code> is not
+                associated with a term.
             </li>
-	    <li>
-              <code>bind(varName, term)</code> updates the substitution in place to associate
-              <code>varName</code> with <code>term</code>, and returns the substitution.
+            <li>
+                <code>bind(varName, term)</code> updates the substitution in place to associate
+                <code>varName</code> with <code>term</code>, and returns the substitution.
             </li>
-	    <li>
-              <code>clone()</code> returns a copy of the substitution.
+            <li>
+                <code>clone()</code> returns a copy of the substitution.
             </li>
-	  </ul>
+        </ul>
         </p>
         <p>
-	  As mentioned in class, a substitution should always be in <em>solved form</em>: any
-          variable that appears in its domain should not appear in its range. You will have to
-          figure out how to maintain this invariant in your interpreter. To make this task easier,
-          implement a method on terms &mdash; i.e., on <code>Var</code>s and <code>Clause</code>s
-          &mdash; called <code>rewrite(s)</code> such that <code>t.rewrite(s)</code> returns the
-          result of applying the substitution <code>s</code> to term <code>t</code>. In other words,
-          <code>rewrite</code> will replace any variables in <code>t</code> with their values
-          according to <code>s</code>, and leave any variables that are not mapped in
-          <code>s</code> alone. (Note that the result of <code>t.rewrite(s)</code> is a new term
-          &mdash; the <code>rewrite</code> method should not modify its receiver.)
+            As mentioned in class, a substitution should always be in <em>solved form</em>: any
+            variable that appears in its domain should not appear in its range. You will have to
+            figure out how to maintain this invariant in your interpreter. To make this task easier,
+            implement a method on terms &mdash; i.e., on <code>Var</code>s and <code>Clause</code>s
+            &mdash; called <code>rewrite(s)</code> such that <code>t.rewrite(s)</code> returns the
+            result of applying the substitution <code>s</code> to term <code>t</code>. In other words,
+            <code>rewrite</code> will replace any variables in <code>t</code> with their values
+            according to <code>s</code>, and leave any variables that are not mapped in
+            <code>s</code> alone. (Note that the result of <code>t.rewrite(s)</code> is a new term
+            &mdash; the <code>rewrite</code> method should not modify its receiver.)
         </p>
         <h3>Unit Tests</h3>
         <p>
-          Please do all your work in a file called <a href="log.js"><code>log.js</code></a>. Each
-          time you refresh this page, that file is loaded by our test harness to run unit tests for
-          each part of the assignment.
+            Please do all your work in a file called <a href="log.js"><code>log.js</code></a>. Each
+            time you refresh this page, that file is loaded by our test harness to run unit tests for
+            each part of the assignment.
         </p>
         <script src="log.js"></script>
         <script src="tests-part1.js"></script>
         <p>
-          You can add your own test cases to this list by editing
-          <a href="tests-part1.js"><code>tests-part1.js</code></a>.
+            You can add your own test cases to this list by editing
+            <a href="tests-part1.js"><code>tests-part1.js</code></a>.
         </p>
-      </section>
-      <section>
+    </section>
+    <section>
         <sectionHeader>
-          <span>Part II: Unification</span>
+            <span>Part II: Unification</span>
         </sectionHeader>
         <p>
-	  As discussed in class, the heart of a Prolog interpreter is <em>unification</em>.
-          Implement a method on <code>Subst</code> called <code>unify(term1, term2)</code> that
-          adds to the given substitution whatever bindings are necessary in order to unify the given
-          terms. If unification succeeds, <code>unify</code> should return the updated substitution;
-          otherwise it should throw an exception like this:
-          <codeBlock>throw new Error('unification failed');</codeBlock>
-          The resulting substitution should be in solved form; the <code>rewrite</code> method
-          that you implemented <a href="#rewrite">above</a> should come in handy.
+            As discussed in class, the heart of a Prolog interpreter is <em>unification</em>.
+            Implement a method on <code>Subst</code> called <code>unify(term1, term2)</code> that
+            adds to the given substitution whatever bindings are necessary in order to unify the given
+            terms. If unification succeeds, <code>unify</code> should return the updated substitution;
+            otherwise it should throw an exception like this:
+            <codeBlock>throw new Error('unification failed');</codeBlock>
+            The resulting substitution should be in solved form; the <code>rewrite</code> method
+            that you implemented <a href="#rewrite">above</a> should come in handy.
         </p>
         <p>
-          Here is the pseudocode for unification that we saw in class.
-          <sidebar>
-            Recall that unification produces the <em>most general unifier</em> of two terms, which
-            is always unique. Intuitively, <code>s</code> is the most general unifier of
-            <code>t1</code> and <code>t2</code> if any other unifier <code>s'</code> of those terms
-            is simply a more constrained version of <code>s</code>, i.e. it has all the constraints
-            of <code>s</code> plus potentially more. For example, <code>{X:a,Y:a}</code> is a more
-            constrained version of <code>{X:Y}</code>.
-          </sidebar>
-          Your implementation will be conceptually similar, except that it will imperatively update
-          a given substitution as it goes rather than returning a new substitution.
-          Also, make sure to implement the <a
-    href="http://en.wikipedia.org/wiki/Occurs_check">occurs check</a>,
-    which is not shown below.
+            Here is the pseudocode for unification that we saw in class.
+            <sidebar>
+                Recall that unification produces the <em>most general unifier</em> of two terms, which
+                is always unique. Intuitively, <code>s</code> is the most general unifier of
+                <code>t1</code> and <code>t2</code> if any other unifier <code>s'</code> of those terms
+                is simply a more constrained version of <code>s</code>, i.e. it has all the constraints
+                of <code>s</code> plus potentially more. For example, <code>{X:a,Y:a}</code> is a more
+                constrained version of <code>{X:Y}</code>.
+            </sidebar>
+            Your implementation will be conceptually similar, except that it will imperatively update
+            a given substitution as it goes rather than returning a new substitution.
+            Also, make sure to implement the <a
+                href="http://en.wikipedia.org/wiki/Occurs_check">occurs check</a>,
+            which is not shown below.
 
-          <style>
-            pseudocode {
-              display: inline-block;
-              text-align: left;
-              font-family: et-book;
-              font-style: italic;
-              font-size: 14pt;
-            }
-            pcline {
-              display: block;
-              margin: 2pt 3pt;
-            }
-            pcline > indented {
-              display: inline-block;
-              margin-left: 20pt;
-            }
-          </style>
-          <center>
+            <style>
+                pseudocode {
+                    display: inline-block;
+                    text-align: left;
+                    font-family: et-book;
+                    font-style: italic;
+                    font-size: 14pt;
+                }
+
+                pcline {
+                    display: block;
+                    margin: 2pt 3pt;
+                }
+
+                pcline > indented {
+                    display: inline-block;
+                    margin-left: 20pt;
+                }
+            </style>
+        <center>
             <pseudocode>
-              <pcline>
-                <mm>X</mm> = <mm>X</mm> &rightarrow; { }
-              </pcline>
-              <pcline>
-                <mm>X</mm> = <mm>t</mm> &rightarrow; { <mm>X</mm>: <mm>t</mm> }<br>
-              </pcline>
-              <pcline>
-                <mm>t</mm> = <mm>X</mm> &rightarrow; { <mm>X</mm>: <mm>t</mm> }<br>
-              </pcline>
-              <pcline>
-                <mm>x</mm><code>(</code><mm>t<sub>1</sub></mm><code>, </code><mm>t<sub>2</sub></mm><code>, </code>&hellip;<code>, </code><mm>t<sub>n</sub></mm><code>)</code> = <mm>x</mm><code>(</code><mm>t<sub>1</sub>'</mm><code>, </code><mm>t<sub>2</sub>'</mm><code>, </code>&hellip;<code>, </code><mm>t<sub>n</sub>'</mm><code>)</code> &rightarrow; <mm>s<sub>1</sub></mm> &cup; <mm>s<sub>2</sub></mm> &cup; &hellip; &cup; <mm>s<sub>n</sub></mm><br>
-                <indented>
-                  <mm>t<sub>1</sub></mm> = <mm>t<sub>1</sub>'</mm> &rightarrow; <mm>s<sub>1</sub></mm><br>
-                  <mm>s<sub>1</sub></mm>(<mm>t<sub>2</sub></mm>) = <mm>s<sub>1</sub></mm>(<mm>t<sub>2</sub>'</mm>) &rightarrow; <mm>s<sub>2</sub></mm><br>
-                  &hellip;<br>
-                  <mm>s<sub>1</sub></mm>(<mm>s<sub>2</sub></mm>(&hellip;(<mm>s<sub>n-1</sub></mm>(<mm>t<sub>n</sub></mm>))&hellip;)) =
-                  <mm>s<sub>1</sub></mm>(<mm>s<sub>2</sub></mm>(&hellip;(<mm>s<sub>n-1</sub></mm>(<mm>t<sub>n</sub>'</mm>))&hellip;))
-                  &rightarrow; <mm>s<sub>n</sub></mm>
-                </indented>
-              </pcline>
+                <pcline>
+                    <mm>X</mm>
+                    =
+                    <mm>X</mm> &rightarrow; { }
+                </pcline>
+                <pcline>
+                    <mm>X</mm>
+                    =
+                    <mm>t</mm> &rightarrow; {
+                    <mm>X</mm>
+                    :
+                    <mm>t</mm>
+                    }<br>
+                </pcline>
+                <pcline>
+                    <mm>t</mm>
+                    =
+                    <mm>X</mm> &rightarrow; {
+                    <mm>X</mm>
+                    :
+                    <mm>t</mm>
+                    }<br>
+                </pcline>
+                <pcline>
+                    <mm>x</mm>
+                    <code>(</code>
+                    <mm>t<sub>1</sub></mm>
+                    <code>, </code>
+                    <mm>t<sub>2</sub></mm>
+                    <code>, </code>&hellip;<code>, </code>
+                    <mm>t<sub>n</sub></mm>
+                    <code>)</code> =
+                    <mm>x</mm>
+                    <code>(</code>
+                    <mm>t<sub>1</sub>'</mm>
+                    <code>, </code>
+                    <mm>t<sub>2</sub>'</mm>
+                    <code>, </code>&hellip;<code>, </code>
+                    <mm>t<sub>n</sub>'</mm>
+                    <code>)</code> &rightarrow;
+                    <mm>s<sub>1</sub></mm> &cup;
+                    <mm>s<sub>2</sub></mm> &cup; &hellip; &cup;
+                    <mm>s<sub>n</sub></mm>
+                    <br>
+                    <indented>
+                        <mm>t<sub>1</sub></mm>
+                        =
+                        <mm>t<sub>1</sub>'</mm> &rightarrow;
+                        <mm>s<sub>1</sub></mm>
+                        <br>
+                        <mm>s<sub>1</sub></mm>
+                        (
+                        <mm>t<sub>2</sub></mm>
+                        ) =
+                        <mm>s<sub>1</sub></mm>
+                        (
+                        <mm>t<sub>2</sub>'</mm>
+                        ) &rightarrow;
+                        <mm>s<sub>2</sub></mm>
+                        <br>
+                        &hellip;<br>
+                        <mm>s<sub>1</sub></mm>
+                        (
+                        <mm>s<sub>2</sub></mm>
+                        (&hellip;(
+                        <mm>s<sub>n-1</sub></mm>
+                        (
+                        <mm>t<sub>n</sub></mm>
+                        ))&hellip;)) =
+                        <mm>s<sub>1</sub></mm>
+                        (
+                        <mm>s<sub>2</sub></mm>
+                        (&hellip;(
+                        <mm>s<sub>n-1</sub></mm>
+                        (
+                        <mm>t<sub>n</sub>'</mm>
+                        ))&hellip;))
+                        &rightarrow;
+                        <mm>s<sub>n</sub></mm>
+                    </indented>
+                </pcline>
             </pseudocode>
-          </center>
+        </center>
         </p>
         <h3>Unit Tests</h3>
         <script src="tests-part2.js"></script>
         <p>
-          You can add your own test cases to this list by editing
-          <a href="tests-part2.js"><code>tests-part2.js</code></a>.
+            You can add your own test cases to this list by editing
+            <a href="tests-part2.js"><code>tests-part2.js</code></a>.
         </p>
-      </section>
-      <section>
+    </section>
+    <section>
         <sectionHeader>
-          <span>Part III: The Solver (putting it all together)</span>
+            <span>Part III: The Solver (putting it all together)</span>
         </sectionHeader>
         <p>
-          Finally, implement <code>Program</code>&rsquo;s <code>solve()</code> method, which
-          produces the solutions for a given program. The solutions should be returned as an
-          <em>iterator</em> of substitutions, each representing a solution to the query in the
-          program.
+            Finally, implement <code>Program</code>&rsquo;s <code>solve()</code> method, which
+            produces the solutions for a given program. The solutions should be returned as an
+            <em>iterator</em> of substitutions, each representing a solution to the query in the
+            program.
         </p>
         <p>
-          Here, an iterator is just an object that has a <code>next()</code> method. This method
-          will either return an instance of <code>Subst</code>, or a <em>falsy</em> value to tell
-          the caller that there are no more solutions. Solutions should be produced in the same
-          order as they are in Prolog. Our test harness and playground will use your iterator to
-          obtain and print solutions.
+            Here, an iterator is just an object that has a <code>next()</code> method. This method
+            will either return an instance of <code>Subst</code>, or a <em>falsy</em> value to tell
+            the caller that there are no more solutions. Solutions should be produced in the same
+            order as they are in Prolog. Our test harness and playground will use your iterator to
+            obtain and print solutions.
         </p>
         <p>
-          <b>Note</b>: The produced substitutions can include more variables than those that appear
-          in the query; our provided <code>evalAST</code> method
-          (see <a href="classes.js"><code>classes.js</code></a>) filters each substitution to find
-          and print only the variables that appear in the query.
+            <b>Note</b>: The produced substitutions can include more variables than those that appear
+            in the query; our provided <code>evalAST</code> method
+            (see <a href="classes.js"><code>classes.js</code></a>) filters each substitution to find
+            and print only the variables that appear in the query.
         </p>
         <p>
-          To handle programs that have an infinite (or just a very large) number of solutions, you
-          should produce solutions <em>lazily</em>, i.e., you should only actually search for the
-          next solution when <code>next()</code> is called on your returned iterator. So your
-          <code>solve</code> method will really just produce an iterator that &ldquo;knows&rdquo;
-          how to search for the next solution whenever it is asked for one. This will require you
-          to maintain some state to represent the current point in your search, so that a call to
-          <code>next()</code> can pick up where the previous call left off, including accounting
-          for the need to backtrack. <em>Hint: Aren&rsquo;t lexically scoped closures great?</em>
+            To handle programs that have an infinite (or just a very large) number of solutions, you
+            should produce solutions <em>lazily</em>, i.e., you should only actually search for the
+            next solution when <code>next()</code> is called on your returned iterator. So your
+            <code>solve</code> method will really just produce an iterator that &ldquo;knows&rdquo;
+            how to search for the next solution whenever it is asked for one. This will require you
+            to maintain some state to represent the current point in your search, so that a call to
+            <code>next()</code> can pick up where the previous call left off, including accounting
+            for the need to backtrack. <em>Hint: Aren&rsquo;t lexically scoped closures great?</em>
         </p>
         <script>
 
-// Replace the `equals` function that is used by the test harness
-// to make it work with iterators.
+            // Replace the `equals` function that is used by the test harness
+            // to make it work with iterators.
 
-TestHarness.equals = function(x, y) {
-  var N = 5;
-  return __equals__(getUpTo(N, x), getUpTo(N, y));
-}
+            TestHarness.equals = function (x, y) {
+                var N = 5;
+                return __equals__(getUpTo(N, x), getUpTo(N, y));
+            }
 
-function getUpTo(n, iter) {
-  if (!iter.next || !iter.rewind) {
-    throw new Error('expected wrapped iterator but got ' + JSON.stringify(iter));
-  }
-  iter.rewind();
-  var solutions = [];
-  while (solutions.length < n) {
-    var solution = iter.next();
-    if (solution) {
-      solutions.push(solution);
-    } else {
-      break;
-    }
-  }
-  return solutions;
-}
+            function getUpTo(n, iter) {
+                if (!iter.next || !iter.rewind) {
+                    throw new Error('expected wrapped iterator but got ' + JSON.stringify(iter));
+                }
+                iter.rewind();
+                var solutions = [];
+                while (solutions.length < n) {
+                    var solution = iter.next();
+                    if (solution) {
+                        solutions.push(solution);
+                    } else {
+                        break;
+                    }
+                }
+                return solutions;
+            }
 
-// This function is used to make the expected results for the unit tests
+            // This function is used to make the expected results for the unit tests
 
-function makeIterator(...args) {
-  var solutions = args.map(obj => {
-    var subst = new Subst();
-    Object.keys(obj).forEach(name => subst.bind(name, obj[name]));
-    return subst;
-  });
-  var idx = 0;
-  return {
-    next: function() {
-      return idx >= args.length ? false : solutions[idx++];
-    },
-    rewind: function() {
-      idx = 0;
-    }
-  };
-}
+            function makeIterator(
+            ...args
+            )
+            {
+                var solutions = args.map(obj => {
+                            var subst = new Subst();
+                Object.keys(obj).forEach(name => subst.bind(name, obj[name])
+            )
+                ;
+                return subst;
+            })
+                ;
+                var idx = 0;
+                return {
+                    next: function () {
+                        return idx >= args.length ? false : solutions[idx++];
+                    },
+                    rewind: function () {
+                        idx = 0;
+                    }
+                };
+            }
 
         </script>
         <h3>Unit Tests</h3>
         <script src="tests-part3.js"></script>
         <p>
-          You can add your own test cases to this list by editing
-          <a href="tests-part3.js"><code>tests-part3.js</code></a>.
+            You can add your own test cases to this list by editing
+            <a href="tests-part3.js"><code>tests-part3.js</code></a>.
         </p>
-      </section>
+    </section>
 
 
-
-
-      <section>
+    <section>
         <sectionHeader>
-          <span>Extra Credit</span>
+            <span>Extra Credit Part : Attempted </span>
         </sectionHeader>
+        <p>
+            <ul>
+                <li>
+                    <sidebar>
+                        The first three of these extra-credit assignments are
+                        eligible for the CS237A extra
+                        project requirement.
+                    </sidebar>
+                    Modify the <a id="pageSourceAnchor">parser</a> to add number literals to our language,
+                    then extend your prototype with support for arithmetic via the <code>is/2</code>
+                    predicate. E.g., <code>is(X, +(15, *(3, 9)))</code> should succeed with <code>X</code>
+                    bound to <code>42</code>. For extra style points, make it possible for the arithmetic
+                    operators to be written in infix notation, with the standard precedences.
+                    <script>
+                        pageSourceAnchor.setAttribute("href", "view-source:" + window.location.href);
+                    </script>
+        <p><b>Features Added :</b></p>
         <p>
         <ul>
-          <li>
-            <sidebar>
-              The first three of these extra-credit assignments are
-              eligible for the CS237A extra
-              project requirement.
-            </sidebar>
-            Modify the <a id="pageSourceAnchor">parser</a> to add number literals to our language,
-            then extend your prototype with support for arithmetic via the <code>is/2</code>
-            predicate. E.g., <code>is(X, +(15, *(3, 9)))</code> should succeed with <code>X</code>
-            bound to <code>42</code>. For extra style points, make it possible for the arithmetic
-            operators to be written in infix notation, with the standard precedences.
-            <script>
-              pageSourceAnchor.setAttribute("href", "view-source:" + window.location.href);
-            </script>
-          </li>
-          <li>
-            Extend your prototype with support for negation and
-            <a href="http://en.wikipedia.org/wiki/Cut_%28logic_programming%29"><em>cut</em></a>.
-          </li>
+            <li>
+                Fixes for HW6 to cover all the corner cases are added.
+            </li>
+            <li>
+                I added support for <b>number literals</b> in our languages. This includes both integers and floating numbers.
+                E.g -2.2, 3, 132.2
+            </li>
+            <li>
+                This extra credit work supports both
+                <b>prefix</b>
+                and
+                <b>infix </b>notation
+                for <code>is,+,-,*,/,% ,^ </code>. E.g <code>is(X , %(4,2))?</code> and
+                <code>X is 4%2?</code>. All of the arithmetic operations can be performed using arithmetic operators
+                <b><code> +,-,*,/,%,^ </code></b>
+                with standard precedence.
+            </li>
+            <li>
+                I have also added <code><b>is/2</b></code> predicate in my language which should contain a Var on LHS and an expression on RHS. If LHS Var is
+                bounded to some value then is/2 checks both terms for equality otherwise it bounds the LHS Var to the
+                evaluated value of RHS.
+                E.g <code>X is 42*2</code>
+            </li>
+
+            <li>
+                Moreover my extension also introduces <b>relational operators</b> in our language. All kind of
+                expression comparisons can be performed using relational
+                operators like <code>>,<,==,!=</code>. <code>is/2</code> and <code>==</code> can be interchangeably used for
+                equality check but as said earlier
+                <code>is/2</code> can only contain one variable on LHS and <code>==</code> can not be used to
+                bound a value to a variable.
+
+            </li>
+            <li>
+                In the rules, bounded variables can be referred by their names <b>(Referencing Variable)</b>. For example if <code>X</code> is bounded
+                to <code>4</code>
+                then <code>Y is 3*X</code> would bound <code>Y</code> to <code>12</code>.
+            </li>
         </ul>
         </p>
-        <script>
-
-          // Replace the `equals` function that is used by the test harness
-          // to make it work with iterators.
-
-          TestHarness.equals = function(x, y) {
-            var N = 5;
-            return __equals__(getUpTo(N, x), getUpTo(N, y));
-          }
-
-          function getUpTo(n, iter) {
-            if (!iter.next || !iter.rewind) {
-              throw new Error('expected wrapped iterator but got ' + JSON.stringify(iter));
-            }
-            iter.rewind();
-            var solutions = [];
-            while (solutions.length < n) {
-              var solution = iter.next();
-              if (solution) {
-                solutions.push(solution);
-              } else {
-                break;
-              }
-            }
-            return solutions;
-          }
-
-          // This function is used to make the expected results for the unit tests
-
-          function makeIterator(...args) {
-            var solutions = args.map(obj => {
-                      var subst = new Subst();
-            Object.keys(obj).forEach(name => subst.bind(name, obj[name]));
-            return subst;
-          });
-            var idx = 0;
-            return {
-              next: function() {
-                return idx >= args.length ? false : solutions[idx++];
-              },
-              rewind: function() {
-                idx = 0;
-              }
-            };
-          }
-
-        </script>
-        <h3>Unit Tests</h3>
-        <script src="tests-partx.js"></script>
-        <p>
-          You can add your own test cases to this list by editing
-          <a href="tests-partx.js"><code>tests-partx.js</code></a>.
+        </li>
+        <li>
+            Extend your prototype with support for negation and
+            <a href="http://en.wikipedia.org/wiki/Cut_%28logic_programming%29"><em>cut</em></a>.
+            <p><b>Features Added :</b></p>
+            <p>
+            <ul>
+                <li>
+                    My extension to this prototype supports <b>negation</b>, similar to the one in Prolog. I have added two ways in which negations can be used,
+                    </code>~/1</code> or <code>not/1</code> predicate. E.g <code>~(person(X))</code> or <code>not(person(X))</code>.
+                </li>
+            <li>
+                    I have also added support for <code><b>cuts</b></code>. This feature is rigorously tested to provide the same functionality as of cut in Prolog.
+                    </code>!</code> should be used to refer cut in a rule. Many of the tests below use cuts in variety of scenarios including cut-fail negations,
+                    fail-cut etc.
+            </li>
+            </ul>
+            </p>
+        </li>
+        </ul>
         </p>
-      </section>
-      <section>
+            <script>
+
+                // Replace the `equals` function that is used by the test harness
+                // to make it work with iterators.
+
+                TestHarness.equals = function (x, y) {
+                    var N = 5;
+                    return __equals__(getUpTo(N, x), getUpTo(N, y));
+                }
+
+                function getUpTo(n, iter) {
+                    if (!iter.next || !iter.rewind) {
+                        throw new Error('expected wrapped iterator but got ' + JSON.stringify(iter));
+                    }
+                    iter.rewind();
+                    var solutions = [];
+                    while (solutions.length < n) {
+                        var solution = iter.next();
+                        if (solution) {
+                            solutions.push(solution);
+                        } else {
+                            break;
+                        }
+                    }
+                    return solutions;
+                }
+
+                // This function is used to make the expected results for the unit tests
+
+                function makeIterator(...args)
+                {
+                    var solutions = args.map(obj => {
+                                var subst = new Subst();
+                    Object.keys(obj).forEach(name => subst.bind(name, obj[name])
+                )
+                    ;
+                    return subst;
+                })
+                    ;
+                    var idx = 0;
+                    return {
+                        next: function () {
+                            return idx >= args.length ? false : solutions[idx++];
+                        },
+                        rewind: function () {
+                            idx = 0;
+                        }
+                    };
+                }
+
+            </script>
+            <h3>Unit Tests</h3>
+            <script src="tests-partx.js"></script>
+            <p>
+                You can add your own test cases to this list by editing
+                <a href="tests-partx.js"><code>tests-partx.js</code></a>.
+            </p>
+    </section>
+    <section>
         <sectionHeader>
-          <span>Playground</span>
+            <span>Playground</span>
         </sectionHeader>
         <script>
-          insertPlayground(
-                  L,
-                  'person(1).\n' +
-                  'person(2).\n' +
-                  'person(X)?'
-          );
+            insertPlayground(
+                    L,
+                    'person(1).\n' +
+                    'person(2).\n' +
+                    'person(X)?'
+            );
 
         </script>
-      </section>
+    </section>
 
 
-    </everything>
-  </body>
+</everything>
+</body>
 </html>
 

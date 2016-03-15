@@ -49,6 +49,8 @@ var L = new Language(g, g.semantics().addOperation('toAST', {
   },
   Clause_args: function(sym, _, as, _) {
     return new Clause(sym.toAST(), as.toAST());
+  },Clause_not: function(sym, _, as, _) {
+    return new Clause("~", [as.toAST()]);
   },
   Clause_neg: function(sym, _, as, _) {
     return new Clause(sym.toAST(), [as.toAST()]);

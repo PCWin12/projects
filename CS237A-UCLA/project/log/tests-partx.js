@@ -160,6 +160,44 @@ tests(
         expected: makeIterator({X: new Num(1)})
     },
     {
+        name: 'cut 2',
+        code: 'b(1).\nb(2).\nb(3).\n\n' +
+        'c(1).\nc(2).\nc(3).\n\n' +
+        'a(X, Y) :- b(X), !, c(Y).\n' +
+        'a(X,Y)?',
+        expected: makeIterator(
+            { X: new Num(1), Y: new Num(1) },
+            { X: new Num(1), Y: new Num(2) },
+            { X: new Num(1), Y: new Num(3) }
+        )
+    },
+    {
+        name: 'cut 3',
+        code: 'b(1).\nb(2).\nb(3).\n\n' +
+        'c(1).\nc(2).\nc(3).\n\n' +
+        'd(4).\nd(6).\n\n' +
+        'a(X, Y) :- b(X), fail, !, c(Y).\n' +
+        'a(X, Y) :- d(X), d(Y).\n' +
+        'a(X,Y)?',
+        expected: makeIterator(
+            { X: new Num(4), Y: new Num(4) },
+            { X: new Num(4), Y: new Num(6) },
+            { X: new Num(6), Y: new Num(4) },
+            { X: new Num(6), Y: new Num(6) }
+        )
+    },
+    {
+        name: 'cut 4',
+        code: 'b(1).\nb(2).\nb(3).\n\n' +
+        'c(1).\nc(2).\nc(3).\n\n' +
+        'd(4).\nd(6).\n\n' +
+        'a(X, Y) :- b(X), !, c(Y), fail.\n' +
+        'a(X, Y) :- d(X), d(Y).\n' +
+        'a(X,Y)?',
+        expected: makeIterator()
+    },
+
+    {
         name: 'not 1',
         code: 'p.\n~(2 == 4)?',
         expected: makeIterator({})
@@ -178,6 +216,39 @@ tests(
         name: 'Primal Check using not, arithmetic and relational operators ',
         code: 'isprime(2).\nisprime(3).\nisprime(P) :- P > 3, P % 2 != 0, ~(hasfactor(P,3)).\nhasfactor(N,L) :- N % L == 0.\nhasfactor(N,L) :- L * L < N, L2 is L + 2, hasfactor(N,L2).\nisprime(4111)?',
         expected: makeIterator({})
+    },
+    {
+        name: ' References in Rules with prefox notations',
+        code: 'p(0).\np(2).\np(5).\np(10).\np(17).\nq(1).\nq(5).\nq(28).\nq(11).\nq(19).\nq(38).\noddeven(X,Y,Z) :- X%2==1, Y%2 == 0, is(Z, +(X,Y)).\np(X), q(Y), oddeven(X,Y,Z), Z%2 == 1?',
+        expected: makeIterator(   { X: new Num(5), Y: new Num(28), Z: new Num(33) },
+            { X: new Num(5), Y: new Num(38), Z: new Num(43) },
+            { X: new Num(17), Y: new Num(28), Z: new Num(45) },
+            { X: new Num(17), Y: new Num(38), Z: new Num(55) })
+    },
+    {
+        name: 'Greatest Common Divisor',
+        code: 'gcd(X,0,X) :- X > 0.\ngcd(X,Y,G) :- Y > 0, Z is X % Y, gcd(Y,Z,G).\ngcd(3134544,1908,G)?',
+        expected: makeIterator(
+            { G: new Num(12)})
     }
+,{
+    name: 'Eulers totient function',
+    code: 'gcd(X,0,X) :- X > 0.\ngcd(X,Y,G) :- Y > 0, Z is X % Y, gcd(Y,Z,G).\ncoprime(X,Y) :- gcd(X,Y,1).\ntotientphi(1,1) :- !.\ntotientphi(M,Phi) :- tphi(M,Phi,1,0).\ntphi(M,Phi,M,Phi) :- !.\n' +
+    'tphi(M,Phi,K,C) :-K < M, coprime(K,M), !,C1 is C + 1, K1 is K + 1,tphi(M,Phi,K1,C1).\ntphi(M,Phi,K,C) :-K < M, K1 is K + 1,tphi(M,Phi,K1,C).\n totientphi(12, X)?',
+    expected: makeIterator(
+        { X: new Num(4)})
+},
+    {
+        name: ' Goldbachs conjecture. ',
+        code: 'isprime(2).isprime(3).\nisprime(P) :- P > 3, P % 2 != 0, ~(hasfactor(P,3)).\nhasfactor(N,L) :- N % L == 0.\nhasfactor(N,L) :- L * L < N, L2 is L + 2, hasfactor(N,L2).\n' +
+        'goldbach(4,[2,2]) :- !.goldbach(N,L) :- N % 2 == 0, N > 4, goldbach(N,L,3).' +
+        '\ngoldbach(N,[P,Q],P) :- Q is N - P, isprime(Q), !.\ngoldbach(N,L,P) :- P < N, nextprime(P,P1), goldbach(N,L,P1).' +
+        '\nnextprime(P,P1) :- P1 is P + 2, isprime(P1), !.\nnextprime(P,P1) :- P2 is P + 2, nextprime(P2,P1).\ngoldbach(28,L)?',
+        expected: makeIterator(
+            { L :  new Clause("_cons", [new Num(5),
+                new Clause("_cons", [new Num(23), new Clause("_nil", [])])])}
+        )
+    }
+
 );
 

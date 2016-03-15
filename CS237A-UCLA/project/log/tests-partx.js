@@ -249,6 +249,17 @@ tests(
                 new Clause("_cons", [new Num(23), new Clause("_nil", [])])])}
         )
     }
+    ,
+    {
+        name: 'Prime Factorization',
+        code: 'primefactors(N,L) :- N > 0,  primefactors(N,L,2).\nprimefactors(1,[],K) :- !.\nprimefactors(N,[F|L],F) :-   R is N / F,(R*10)%10==0, N == R * F, !, primefactors(R,L,F).\n' +
+        'primefactors(N,L,F) :-  nextfactor(N,F,NF), primefactors(N,L,NF).\nnextfactor(K,2,3) :- !.\nnextfactor(N,F,NF) :- F * F < N, !, NF is F + 2.\n' +
+        'nextfactor(N,K,N).primefactors(22,L)?',
+        expected: makeIterator(
+            { L :  new Clause("_cons", [new Num(2),
+                new Clause("_cons", [new Num(11), new Clause("_nil", [])])])}
+        )
+    }
 
 );
 

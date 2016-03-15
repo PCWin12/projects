@@ -36,9 +36,11 @@ L {
     = "is" "(" variable "," AddExpr ")"  -- infix
     | symbola "(" Term "," Term ")" -- arth
     | AddExpr binop AddExpr -- binop
-    | variable "is" AddExpr -- infixis
+    | variable "is" Term -- infixis
     | symbol "(" Terms ")"  -- args
     | symbol                -- noArgs
+    | "!"   -- cut
+    | "~" "(" Clause ")"   -- neg
 
   Clauses
     = NonemptyListOf<Clause, ",">
@@ -49,8 +51,9 @@ L {
   Term
     = Clause
     | List
-    | variable
     | AddExpr
+    | variable
+
 
   List
     = "[" Contents? "]"

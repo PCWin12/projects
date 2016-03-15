@@ -50,7 +50,12 @@ var L = new Language(g, g.semantics().addOperation('toAST', {
   Clause_args: function(sym, _, as, _) {
     return new Clause(sym.toAST(), as.toAST());
   },
-
+  Clause_neg: function(sym, _, as, _) {
+    return new Clause(sym.toAST(), [as.toAST()]);
+  },
+  Clause_cut: function(sym) {
+    return new Clause(sym.toAST(), []);
+  },
   Clause_noArgs: function(sym) {
     return new Clause(sym.toAST(), []);
   },

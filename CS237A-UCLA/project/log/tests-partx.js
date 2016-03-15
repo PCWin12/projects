@@ -4,36 +4,7 @@
 tests(
     L,
     {
-        name: 'duh (1/3)',
-        code: 'p.\n' +
-        'p?',
-        expected: makeIterator({})
-    },
-    {
-        name: 'duh (2/3)',
-        code: 'p.\n' +
-        'q?',
-        expected: makeIterator()
-    },
-    {
-        name: 'duh (3/3)',
-        code: 'p.\n' +
-        'q.\n' +
-        'p, q?',
-        expected: makeIterator({})
-    },
-    {
-        name: 'alice and bob are people',
-        code: 'person(1).\n' +
-        'person(2).\n' +
-        'person(X)?',
-        expected: makeIterator(
-            { X: new Num(1) },
-            { X: new Num(2) }
-        )
-    },
-    {
-        name: 'sick and tired',
+        name: 'sick and tired with integers',
         code: 'sick(3).\n' +
         'sick(4).\n' +
         'sick(5).\n' +
@@ -45,7 +16,7 @@ tests(
         )
     },
     {
-        name: "prereqs",
+        name: "prereqs with integers",
         code: 'prereq(131, 1371).\n' +
         'prereq(1371, 137).\n' +
         'prereqTrans(X, Y) :- prereq(X, Y).\n' +
@@ -94,24 +65,6 @@ tests(
         )
     },
     {
-        name: 'plus (2/3)',
-        code: 'plus(z, X, X).\n' +
-        'plus(s(X), Y, s(Z)) :- plus(X, Y, Z).\n' +
-        'plus(X, s(s(z)), s(s(s(z))))?\n',
-        expected: makeIterator(
-            { X: new Clause("s", [new Clause("z", [])]) }
-        )
-    },
-    {
-        name: 'plus (3/3)',
-        code: 'plus(z, X, X).\n' +
-        'plus(s(X), Y, s(Z)) :- plus(X, Y, Z).\n' +
-        'plus(s(z), X, s(s(s(z))))?\n',
-        expected: makeIterator(
-            { X: new Clause("s", [new Clause("s", [new Clause("z", [])])]) }
-        )
-    },
-    {
         name: 'cons and car',
         code: 'car([X|Y], X).\n' +
         'car([11,22,33], X)?',
@@ -120,98 +73,98 @@ tests(
         )
     },
     {
-        name: 'length',
-        code: 'length([], z).\n' +
-        'length([H|T], s(LT)) :- length(T, LT).\n' +
-        'length([a,b,c], X)?',
+        name: 'fib using is , > and numbers',
+        code: 'fib(1,1).\nfib(2,1).\nfib(N,R):- N > 2,NN is N-1,NNN is N-2,fib(NN,RR),fib(NNN,RRR),R is RR+RRR.\nfib(7,R)?\n',
         expected: makeIterator(
-            { X: new Clause("s", [new Clause("s", [new Clause("s", [new Clause("z", [])])])]) }
+            { R: new Num(13) }
         )
     },
     {
-        name: 'append (1/3)',
-        code: 'append([], L, L).\n' +
-        'append([H|T], L2, [H|L3]) :- append(T, L2, L3).\n' +
-        'append([1, 2], [3, 4], X)?',
+        name: 'Factorial',
+        code: 'fact(0,1).\nfact(N,F) :-N>0,N1 is N-1,fact(N1,F1), F is N * F1.\nfact(6,F)?',
         expected: makeIterator(
-            { X: new Clause("_cons", [new Num(1),
-                new Clause("_cons", [new Num(2),
-                    new Clause("_cons", [new Num(3),
-                        new Clause("_cons", [new Num(4), new Clause("_nil", [])])])])]) })
-    },
-    {
-        name: 'append (2/3)',
-        code: 'append([], L, L).\n' +
-        'append([H|T], L2, [H|L3]) :- append(T, L2, L3).\n' +
-        'append(X, [4, 5], [1, 2, 4, 5])?',
-        expected: makeIterator(
-            { X: new Clause("_cons", [new Num(1),
-                new Clause("_cons", [new Num(2), new Clause("_nil", [])])]) })
-    },
-    {
-        name: 'append (3/3)',
-        code: 'append([], L, L).\n' +
-        'append([H|T], L2, [H|L3]) :- append(T, L2, L3).\n' +
-        'append([1, 2], X, [1, 2, 3, 4])?',
-        expected: makeIterator(
-            { X: new Clause("_cons", [new Num(3),
-                new Clause("_cons", [new Num(4), new Clause("_nil", [])])]) })
-    },
-    {
-        name: "homer's children",
-        code: 'father(homer, bart).\n' +
-        'father(homer, lisa).\n' +
-        'father(homer, maggie).\n' +
-        'parent(X, Y) :- father(X, Y).\n' +
-        'parent(homer, Y)?',
-        expected: makeIterator(
-            { Y: new Clause("bart", []) },
-            { Y: new Clause("lisa", []) },
-            { Y: new Clause("maggie", []) }
+            { F: new Num(720) }
         )
     },
     {
-        name: "lisa's father",
-        code: 'father(homer, bart).\n' +
-        'father(homer, lisa).\n' +
-        'father(homer, maggie).\n' +
-        'parent(X, Y) :- father(X, Y).\n' +
-        'parent(X, lisa)?',
+        name: 'Dot Product',
+        code: 'prodv([X],[Y],[R]):- R is X*Y.\nprodv([H|T],[HH|TT],[R|RR]):- prodv(T,TT,RR),R is H*HH.\n prodv([2,4],[2,3],R)?',
         expected: makeIterator(
-            { X: new Clause("homer", []) }
+            { R: new Clause("_cons", [new Num(4),
+                new Clause("_cons", [new Num(12), new Clause("_nil", [])])]) }
         )
     },
     {
-        name: "parent",
-        code: 'father(abe, homer).\n' +
-        'father(homer, bart).\n' +
-        'father(homer, lisa).\n' +
-        'father(homer, maggie).\n' +
-        'parent(X, Y) :- father(X, Y).\n' +
-        'parent(X, Y)?',
+        name: 'Max Cut',
+        code: 'max(X,Y,Y) :- X < Y,!.\nmax(X,Y,X).\nmax(101,100,X)?',
         expected: makeIterator(
-            { X: new Clause("abe", []), Y: new Clause("homer", []) },
-            { X: new Clause("homer", []), Y: new Clause("bart", []) },
-            { X: new Clause("homer", []), Y: new Clause("lisa", []) },
-            { X: new Clause("homer", []), Y: new Clause("maggie", []) }
+            { X: new Num(101) }
         )
     },
     {
-        name: "grandfather",
-        code: 'father(orville, abe).\n' +
-        'father(abe, homer).\n' +
-        'father(homer, bart).\n' +
-        'father(homer, lisa).\n' +
-        'father(homer, maggie).\n' +
-        'parent(X, Y) :- father(X, Y).\n' +
-        'grandfather(X, Y) :- father(X, Z), parent(Z, Y).\n' +
-        'grandfather(X, Y)?',
+        name: 'Power Cut',
+        code: 'power(N,0,1):- !.\npower(N,K,R):- K1 is K-1,power(N,K1,R1),R is R1*N.\npower(4,4,R)?',
         expected: makeIterator(
-            { X: new Clause("orville", []), Y: new Clause("homer", []) },
-            { X: new Clause("abe", []), Y: new Clause("bart", []) },
-            { X: new Clause("abe", []), Y: new Clause("lisa", []) },
-            { X: new Clause("abe", []), Y: new Clause("maggie", []) }
+            { R: new Num(256) }
         )
+    },
+    {
+        name: 'Deletes all the occurences of an element in a list',
+        code: 'delete(X,[],[]).\ndelete(X,[X|T],R):- delete(X,T,R),!.\ndelete(X,[Y|T],[Y|R]):- delete(X,T,R).\ndelete(1,[1,2,[1,3],1,5],R)?',
+        expected: makeIterator(
+            { R: new Clause("_cons", [new Num("2"), new Clause("_cons", [new Clause("_cons", [new Num("1"), new Clause("_cons", [new Num("3"), new Clause("_nil", [])])]), new Clause("_cons", [new Num("5"), new Clause("_nil", [])])])])}
+        )
+    },
+    {
+    name: 'Insertion Sort of a list',
+        code: 'insertsort(L,S):-isort(L,[],S).\nisort([],A,A).\nisort([H|T],A,S):-insert(H,A,NA),isort(T,NA,S).\ninsert(X,[Y|T],[Y|NT]):- X>Y,insert(X,T,NT).\ninsert(X,[Y|T],[X,Y|T]):- X -1 <Y.\ninsert(X,[],[X]).\ninsertsort([12,43,123,656,7],S)?' ,
+        expected: makeIterator(
+        { S: new Clause("_cons", [new Num("7"), new Clause("_cons", [new Num("12"), new Clause("_cons", [new Num("43"), new Clause("_cons", [new Num("123"), new Clause("_cons", [new Num("656"), new Clause("_nil", [])])])])])])}
+    )},
+    {
+        name: 'Split Negative and Positive Using Cut',
+        code: 'split([],[],[]).\nsplit([X|L],[X|L1],L2):- X> 0,!,split(L,L1,L2).\nsplit([X|L],L1,[X|L2]):-split(L,L1,L2).\nsplit([1,-3,-5,2],X,Y)?',
+        expected: makeIterator(
+            { X:new Clause("_cons", [new Num("1"), new Clause("_cons", [new Num("2"), new Clause("_nil", [])])]) ,
+            Y :new Clause("_cons", [new Num("-3"), new Clause("_cons", [new Num("-5"), new Clause("_nil", [])])]) }
+        )
+    },
+    {
+        name: 'Sum list -- Arithmetic Check ',
+        code: 'sum([],0).\nsum([X|List],Sum) :-sum(List,Sum1), Sum is X + Sum1.\nsum([1,2,3,4],S)?\n',
+        expected: makeIterator(
+            { S:new Num(10)}
+        )
+    },
+    {
+        name: 'QuickSort with Cuts and floats',
+        code: 'append([], L, L).\nappend([H|T], L2, [H|L3]) :- append(T, L2, L3).\nfilter( [], X, [], []).\n' +
+        'filter( [X|Y], P, [X|L], H ):- X-1 < P, filter(Y, P, L, H).\nfilter( [X|Y], P, L, [X|H] ):- X > P, filter(Y, P, L, H).\n' +
+        'qsort([], []):-!.\nqsort([X], [X]):-!.\nqsort([X,Y], [X,Y]):-X-1<Y,!.\nqsort([X,Y], [Y,X]):-X>Y,!.\nqsort([X|Y], SXY):- filter(Y, X, L, H), qsort(L,SL), qsort(H,SH), append(SL, [X], SLX), append(SLX, SH, SXY).\n' +
+        'qsort([13,12.2,7.6,5.4],X)?',
+        expected: makeIterator(
+            {X:new Clause("_cons", [new Num("5.4"), new Clause("_cons", [new Num("7.6"), new Clause("_cons", [new Num("12.2"), new Clause("_cons", [new Num("13"), new Clause("_nil", [])])])])])}
+        )
+    },
+
+    {
+        name: 'Cut- fail negation',
+        code: 'enjoys(vincent,X) :- bigkahunaburger(X),!,fail.\nenjoys(vincent,X) :- burger(X).\nburger(X) :- bigmac(X).' +
+        '\nburger(X) :- bigkahunaburger(X).\nburger(X) :- whopper(X).\nbigmac(a).\nbigkahunaburger(b).\nbigmac(c).' +
+        '\nwhopper(d).\nenjoys(vincent,b)?',
+        expected: makeIterator()
+    },
+    {
+        name: 'Cut 1',
+        code: 'p(X):- a(X).\np(X):- b(X),c(X),!,d(X),e(X).\np(X):- f(X).\na(1).\nb(1). b(2).\nc(1). c(2).\nd(2).\ne(2).\nf(3)\n.p(X)?',
+        expected: makeIterator({X: new Num(1)})
+    },
+    {
+        name: 'not 1',
+        code: 'p.\n~(2 == 4)?',
+        expected: makeIterator({})
     }
+
+
 );
 

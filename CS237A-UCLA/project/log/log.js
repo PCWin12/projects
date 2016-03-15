@@ -236,14 +236,20 @@ Iterator.prototype.next = function(sbst){
   }
 
   // get the solving goal
+
   if(this.goal.length == 0){
+    if(this.stack.length == 0 ){
+      if(sbst !== undefined)
+      return current_subst;
+      else{return false}
+    }
     current_goal = this.stack.pop();
     rule_look = current_goal[2];
     current_subst = current_goal[1];
     this.goal = current_goal[0].slice(1);
     current_goal = current_goal[0][0];
   }else {
-    current_goal = this.goal.pop()
+    current_goal = this.goal.pop();
   }
 
   if(current_goal.name === "is"){
@@ -255,12 +261,25 @@ Iterator.prototype.next = function(sbst){
       return this.next(current_subst)
     }catch(e){
       if(this.stack.length !== 0 ){
+        this.goal = [];
         return this.next();
       }
       return false;
     }
+  }else if(current_goal.name === "!"){
+      this.stack = [];
+      return this.next(current_subst);
+    }else if(current_goal.name === "~"){
+    this.goal = this.goal.concat(current_goal.args[0]);
+    var temp_sbst = current_subst.clone();
+    var temp = this.next(current_subst);
+    
+    if(temp){
+      return false;
+    }else{
+      return current_subst;
+    }
   }
-
   if(current_goal instanceof Comp){
     try {
       current_goal.unify(current_subst);
@@ -270,12 +289,12 @@ Iterator.prototype.next = function(sbst){
       return this.next(current_subst)
     }catch(e){
       if(this.stack.length !== 0 ){
+        this.goal = [];
         return this.next();
       }
       return false;
     }
   }
-
   for(var i =rule_look  ; i< this.rules.length ; i++) {
     if (current_goal.name === this.rules[i].head.name && current_goal.args.length === this.rules[i].head.args.length) {
       this.stack.push([[current_goal].concat(this.goal), current_subst.clone(), i + 1]);
@@ -294,11 +313,13 @@ Iterator.prototype.next = function(sbst){
       }
     }
   }
-if(this.goal.length !== 0 ){
-  return false
-}
+
   if(this.stack.length !== 0 ){
+    this.goal = [];
     return this.next();
+  }
+  if(this.goal.length !== 0 ){
+    return false
   }
   return false;
   // check if backtracking or not

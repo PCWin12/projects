@@ -61,7 +61,9 @@ var L = new Language(g, g.semantics().addOperation('toAST', {
   Clause_noArgs: function(sym) {
     return new Clause(sym.toAST(), []);
   },
-
+  Clause_write: function(sym, _, as, _) {
+    return new Clause(sym.toAST(), as.toAST());
+  },
   List: function(_, xs, _) {
     return xs.toAST()[0] || new Clause('_nil', []);
   },
@@ -106,6 +108,24 @@ var L = new Language(g, g.semantics().addOperation('toAST', {
 
   PriExpr_paren: function(_op, e, _cp) {
     return e.toAST();
+  },
+  string: function(_oq, cs, _cq) {
+    var chars = [];
+    var idx = 0;
+    cs = cs.toAST();
+    while (idx < cs.length) {
+      var c = cs[idx++];
+      if (c === '\\' && idx < cs.length) {
+        c = cs[idx++];
+        switch (c) {
+          case 'n': c = '\n'; break;
+          case 't': c = '\t'; break;
+          default: idx--;
+        }
+      }
+      chars.push(c);
+    }
+    return new Str(chars.join(''));
   },
   number: function(_) {
     return new Num(parseFloat(this.interval.contents));

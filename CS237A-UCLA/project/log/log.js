@@ -24,7 +24,9 @@ Var.prototype.freshnames = function () {
 Num.prototype.freshnames = function () {
     return this;
 };
-
+Str.prototype.freshnames = function () {
+    return this;
+};
 Clause.prototype.freshnames = function () {
     var temp_args = [];
     for (var i = 0; i < this.args.length; i++) {
@@ -231,9 +233,24 @@ function Iterator(rules, queries) {
     this.subst = [];
     this.stack = [];
     this.goal = this.queries.slice().reverse()
+    this.output_String = "";
 
 }
-
+Iterator.prototype.toOutput = function(goal, sbst){
+    var temp = "";
+    for(var i =0 ; i < goal.args.length ; i++){
+        if(goal.args[i] instanceof Var){
+            var a = goal.args[i].name;
+            temp = temp + sbst.lookup(goal.args[i].name)+ "  "
+        }else if(goal.args[i] instanceof Clause){
+            temp = temp + goal.args[i].name +"  ";
+        }else if(goal.args[i] instanceof Str){
+         temp = temp + goal.args[i].name +"  ";
+        }
+    }
+    this.output_String = this.output_String + temp+"\n";
+    wind_output.setValue(this.output_String);
+};
 Iterator.prototype.next = function (sbst) {
     var current_goal, rule_look = 0, current_subst = new Subst();
     if (sbst !== undefined) {
@@ -257,6 +274,14 @@ Iterator.prototype.next = function (sbst) {
         current_goal = current_goal[0][0];
     } else {
         current_goal = this.goal.pop();
+    }
+
+    if(wind_output!== undefined && current_goal.name === "write") {
+        this.toOutput(current_goal,current_subst.clone())
+        if(this.goal.length === 0){
+            return current_subst
+        }
+        return this.next(current_subst);
     }
 
     if (current_goal.name === "is") {
@@ -337,8 +362,10 @@ Iterator.prototype.next = function (sbst) {
     return false;
     // check if backtracking or not
 };
-
-Program.prototype.solve = function () {
+var wind_output =
+Program.prototype.solve = function (out) {
+    wind_output = out;
+    if(out !==undefined)wind_output.setValue('');
 //  throw new TODO('Program.prototype.solve not implemented');
     return new Iterator(this.rules, this.query)
 

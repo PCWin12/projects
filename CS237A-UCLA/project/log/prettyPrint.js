@@ -189,7 +189,9 @@ Mod.prototype.prettyPrint = function(strm) {
   strm.dedent();
   strm.write(' )')
 };
-
+Str.prototype.prettyPrint = function(strm) {
+  strm.write(this.name);
+};
 Div.prototype.prettyPrint = function(strm) {
   strm.write('new Div( ');
   strm.indentFromHere();

@@ -74,7 +74,7 @@ function insertPlayground(L, optSource) {
   var abs = L.grammar ? addEditor('abstract syntax', 630, 200, true) : undefined;
   var trans = L.transAST ? addEditor('translation', 630, 200, true) : undefined;
   var res = addEditor('result', 630, 100, true);
-
+  var outwin = addEditor('Output', 630, 100, true);
   function clearEverythingElse() {
     if (abs) {
       abs.setValue('');
@@ -82,6 +82,7 @@ function insertPlayground(L, optSource) {
     if (trans) {
       trans.setValue('');
     }
+    outwin.setValue('');
     res.setValue('');
   }
     
@@ -130,7 +131,7 @@ function insertPlayground(L, optSource) {
         return;
       }
     } else {
-      callAndShowResult(function() { return L.evalAST(ast); });
+      callAndShowResult(function() { return L.evalAST(ast, outwin); });
     }
   }
 
@@ -141,7 +142,9 @@ function insertPlayground(L, optSource) {
       res.setValue(showException(e));
     }
   }
-
+  function haveOutput(value) {
+    res.setValue(value);
+  }
   function haveResult(value) {
     res.setValue(L.prettyPrintValue(value));
   }

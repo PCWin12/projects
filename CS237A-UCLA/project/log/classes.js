@@ -55,6 +55,14 @@ class Comp extends AST {
   }
 }
 
+
+class Str extends AST {
+  constructor(e1) {
+    super();
+    this.name = e1;
+  }
+}
+
 class Add extends AST {
   constructor(e1, e2) {
     super();
@@ -157,9 +165,8 @@ Subst.prototype.filter = function(names) {
 // substitutions. The implementation of the `evalAST` method below calls that method, and filters
 // out the bindings that don't have anything to do with the query. It also wraps the iterator in
 // order to support a `rewind` method that is used by the test harness.
-
-L.evalAST = function(progAST) {
-  var iter = progAST.solve();
+L.evalAST = function(progAST, out) {
+  var iter = progAST.solve(out);
   if (!iter || !iter.next) {
     throw new Error('expected an iterator but got ' + JSON.stringify(iter));
   }

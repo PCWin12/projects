@@ -35,6 +35,7 @@ L {
   Clause  (a clause)
     = "is" "(" variable "," AddExpr ")"  -- infix
     | "not" "(" Clause ")"   -- not
+    | "write" "(" Bypl ")" -- write
     | symbola "(" Term "," Term ")" -- arth
     | AddExpr binop AddExpr -- binop
     | variable "is" Term -- infixis
@@ -69,11 +70,21 @@ L {
     = "-"? digit+ ("." digit+)?  -- wholeAndFrac
     | "-"? "." digit+            -- onlyFrac
 
+    Bypl
+    = ListOf<Byp, ",">
+
+    Byp
+    = string
+    | variable
+
+
   // Lexical rules
   variable  (a variable)
     = upper alnum*
 
 
+ string  (a string literal)
+    = "\"" (~"\"" ~"\n" any)* "\""
  binop
   =  ">"  | "<"  | "=="  | "!="
 
@@ -645,7 +656,7 @@ L {
                 Fixes for HW6 to cover all the corner cases are added.
             </li>
             <li>
-                I added support for <b>number literals</b> in our languages. This includes both integers and floating numbers.
+                I added support for <b>number literals</b> in the language. This includes both integers and floating numbers.
                 E.g -2.2, 3, 132.2
             </li>
             <li>
@@ -659,14 +670,14 @@ L {
                 with standard precedence.
             </li>
             <li>
-                I have also added <code><b>is/2</b></code> predicate in my language which should contain a Var on LHS and an expression on RHS. If LHS Var is
+                I have also added <code><b>is/2</b></code> predicate in the language which should contain a Var on LHS and an expression on RHS. If LHS Var is
                 bounded to some value then is/2 checks both terms for equality otherwise it bounds the LHS Var to the
                 evaluated value of RHS.
                 E.g <code>X is 42*2</code>
             </li>
 
             <li>
-                Moreover my extension also introduces <b>relational operators</b> in our language. All kind of
+                Moreover my extension also introduces <b>relational operators</b> in the language. All kind of
                 expression comparisons can be performed using relational
                 operators like <code>>,<,==,!=</code>. <code>is/2</code> and <code>==</code> can be interchangeably used for
                 equality check but as said earlier
@@ -700,6 +711,15 @@ L {
             </ul>
             </p>
         </li>
+        <li>
+            Another extension to this prototype is <b>I/O operations</b>. Currently I only added the output/print operation to the language similar to <code>write/n</code> predicate in
+            Prolog.
+            <p><ul><li> Write predicate in my implementation takes in <code>n</code> terms including strings. When this predicate is unified, all the terms are printed in
+            the output window of the play ground with respect to their current substitutions. This output window is also added by me to display the output stream from write predicate.
+            E.g with {X:4} as current bounds, <code>write("The value of X is " , X)</code> will print <code>"The value of X is 4"</code>.
+            </li></ul></p>
+        </li>
+
         </ul>
         </p>
             <script>

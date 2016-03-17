@@ -74,7 +74,7 @@ function insertPlayground(L, optSource) {
   var abs = L.grammar ? addEditor('abstract syntax', 630, 200, true) : undefined;
   var trans = L.transAST ? addEditor('translation', 630, 200, true) : undefined;
   var res = addEditor('result', 630, 100, true);
-  var outwin = addEditor('Output', 630, 100, true);
+  var outwin = addEditor('Output', 630, 100 , true);
   function clearEverythingElse() {
     if (abs) {
       abs.setValue('');

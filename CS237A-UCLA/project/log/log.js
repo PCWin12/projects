@@ -234,9 +234,9 @@ function Iterator(rules, queries) {
     this.stack = [];
     this.goal = this.queries.slice().reverse()
     this.output_String = "";
-
 }
-Iterator.prototype.toOutput = function(goal, sbst){
+
+ Iterator.prototype.toOutput = function(goal, sbst){
     var temp = "";
     for(var i =0 ; i < goal.args.length ; i++){
         if(goal.args[i] instanceof Var){
@@ -362,13 +362,13 @@ Iterator.prototype.next = function (sbst) {
     return false;
     // check if backtracking or not
 };
-var wind_output =
+var wind_output ;
 Program.prototype.solve = function (out) {
     wind_output = out;
-    if(out !==undefined)wind_output.setValue('');
-//  throw new TODO('Program.prototype.solve not implemented');
+    if(out !==undefined) {
+        wind_output.setValue('');
+    }
     return new Iterator(this.rules, this.query)
-
 };
 
 

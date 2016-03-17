@@ -656,11 +656,11 @@ L {
                 Fixes for HW6 to cover all the corner cases are added.
             </li>
             <li>
-                I added support for <b>number literals</b> in the language. This includes both integers and floating numbers.
+                I have added support for <b>number literals</b> in the language. This includes both integers and floating numbers.
                 E.g -2.2, 3, 132.2
             </li>
             <li>
-                This extra credit work supports both
+                This extra credit extension supports both
                 <b>prefix</b>
                 and
                 <b>infix </b>notation
@@ -670,15 +670,15 @@ L {
                 with standard precedence.
             </li>
             <li>
-                I have also added <code><b>is/2</b></code> predicate in the language which should contain a Var on LHS and an expression on RHS. If LHS Var is
+                I have also added <code><b>is/2</b></code> predicate in the language. <code><b>is/2</b></code> should contain a Var on LHS and an expression on RHS. If LHS Var is
                 bounded to some value then is/2 checks both terms for equality otherwise it bounds the LHS Var to the
-                evaluated value of RHS.
-                E.g <code>X is 42*2</code>
+                evaluated value of RHS. For example in case of <code>X is 42*2</code> if X is bounded to some value then the equality check will be performed otherwise
+                X will be bounded to 84.
             </li>
 
             <li>
-                Moreover my extension also introduces <b>relational operators</b> in the language. All kind of
-                expression comparisons can be performed using relational
+                Moreover my extension also introduces <b>relational operators</b> in the language. The prototype now supports all kinds of
+                expression comparisons that can be performed using relational
                 operators like <code>>,<,==,!=</code>. <code>is/2</code> and <code>==</code> can be interchangeably used for
                 equality check but as said earlier
                 <code>is/2</code> can only contain one variable on LHS and <code>==</code> can not be used to
@@ -686,7 +686,7 @@ L {
 
             </li>
             <li>
-                In the rules, bounded variables can be referred by their names <b>(Referencing Variable)</b>. For example if <code>X</code> is bounded
+                In the Rules, bounded variables can be referred to by their names (support for <b>Referencing Variable</b>). For example if <code>X</code> is bounded
                 to <code>4</code>
                 then <code>Y is 3*X</code> would bound <code>Y</code> to <code>12</code>.
             </li>
@@ -701,7 +701,7 @@ L {
             <ul>
                 <li>
                     My extension to this prototype supports <b>negation</b>, similar to the one in Prolog. I have added two ways in which negations can be used,
-                    </code>~/1</code> or <code>not/1</code> predicate. E.g <code>~(person(X))</code> or <code>not(person(X))</code>.
+                    </code>~/1</code> or <code>not/1</code> predicate. E.g <code>~(person(X))</code> or <code>not(person(X))</code>. A large variation of unit tests were also added to test this feature thoroughly.
                 </li>
             <li>
                     I have also added support for <code><b>cuts</b></code>. This feature is rigorously tested to provide the same functionality as of cut in Prolog.
@@ -715,8 +715,8 @@ L {
             Another extension to this prototype is <b>I/O operations</b>. Currently I only added the output/print operation to the language similar to <code>write/n</code> predicate in
             Prolog.
             <p><ul><li> Write predicate in my implementation takes in <code>n</code> terms including strings. When this predicate is unified, all the terms are printed in
-            the output window of the play ground with respect to their current substitutions. This output window is also added by me to display the output stream from write predicate.
-            E.g with {X:4} as current bounds, <code>write("The value of X is " , X)</code> will print <code>"The value of X is 4"</code>.
+            the output window of the play ground with respect to their current substitutions.I have also embedded the output window to display the output stream from write predicate.
+            E.g with {X:4} as current bindings, <code>write("The value of X is " , X)</code> will print <code>"The value of X is 4"</code> in the output window.
             </li></ul></p>
         </li>
 
@@ -787,7 +787,11 @@ L {
         <script>
             insertPlayground(
                     L,
-                    'primefactors(N,L) :- N > 0,  primefactors(N,L,2).\nprimefactors(1,[],K) :- !.\nprimefactors(N,[F|L],F) :-   R is N / F,write("Remainder is",R),(R*10)%10==0,write("After Integer Check",R), N == R * F, !, primefactors(R,L,F).' +
+                    'primefactors(N,L) :- N > 0,  primefactors(N,L,2).\nprimefactors(1,[],K) :- !.\nprimefactors(N,[F|L],F) :-   R is N / F,' +
+                    'write("Remainder is",R),' +
+                    '(R*10)%10==0' +
+                    ',write("After Integer Check",R)' +
+                    ', N == R * F, !, primefactors(R,L,F).' +
                     'primefactors(N,L,F) :-  nextfactor(N,F,NF), primefactors(N,L,NF).\nnextfactor(K,2,3) :- !.' +
                     'nextfactor(N,F,NF) :- F * F < N, !, NF is F + 2.\nnextfactor(N,K,N).\nprimefactors(22,L)?\n'
             );
